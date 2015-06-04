@@ -7,63 +7,69 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <link rel="stylesheet" type="text/css" href="stylesheets/default.min.css" media="screen">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <title>Videojj-api by Venvy-dev</title>
   </head>
-
   <body>
     <div id="container">
       <div class="inner">
-
         <header>
           <h1>Video + +</h1>
           <h2>video ++ 开放平台使用文档 </h2>
         </header>
-
         <section id="downloads" class="clearfix">
           <a href="https://github.com/Venvy-dev/videojj-api/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
           <a href="https://github.com/Venvy-dev/videojj-api/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
           <a href="https://github.com/Venvy-dev/videojj-api" id="view-on-github" class="button"><span>View on GitHub</span></a>
         </section>
-
         <hr>
-
         <section id="main_content">
           <h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useage</h3>
+            <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true">
+              <span class="octicon octicon-link"></span>
+            </a>
+            Useage
+          </h3>
+<pre>
+下载源代码
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-<hr>
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Q & A</h3>
-<p>
-   提问 <a href="https://github.com/Venvy-dev/videojj-api/issues" class="user-mention">@issue主页</a>
-</p>
-<p>
-  <h4>Q : 如何进行本地调试?</h4>
-</p>
-<p>A : video++ 默认调试地址支持以 192/127/开头域名、localhost.</p>
-<hr>
-<!-- 联系  -->
-<h3>Contact</h3>
-
-联系 <a href="mailto:bpc@venvyvideo.cn" class="user-mention">bpc@venvyvideo.cn</a>
-
-</p>
-    </section>
-
+引用样式文件Iva.css
+<code class="html">&lt;link rel="stylesheet" type="text/css" href="Iva.css"&gt;</code>
+引用脚本文件Iva.js
+<code class="html">&lt;script type="text/javascript" src="Iva.js"&gt;&lt;/script&gt;</code>
+创建Iva实例
+<code class="javascript">new Iva('playerCnt'/* 父容器id，为了保证浏览体验，请给父容器设置宽高860px*480px以上*/, {
+  video: 'http://v.youku.com/v_show/id_XODIzNTE5NTY0.html',/* 视频播放地址 */
+  cover: 'http://img0.bdstatic.com/img/image/4a75a05f8041bf84df4a4933667824811426747915.jpg'/* 视频封面，可选 */
+});</code>
+</pre>
+          <hr>
+          <h3>
+            <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+            Q & A
+          </h3>
+          <p>
+             提问 <a href="https://github.com/Venvy-dev/videojj-api/issues" class="user-mention">@issue主页</a>
+          </p>
+          <p>
+            <h4>Q : 如何进行本地调试?</h4>
+          </p>
+          <p>A : video++ 默认调试地址支持以 192/127/开头域名、localhost.</p>
+          <hr>
+          <!-- 联系  -->
+          <h3>Contact</h3>
+          联系 <a href="mailto:bpc@venvyvideo.cn" class="user-mention">bpc@venvyvideo.cn</a>
+          </p>
+        </section>
         <footer>
           Videojj-api is maintained by <a href="http://videojj.com">云视链开放平台 &copy; 2015</a><br>
-
         </footer>
-
-
       </div>
     </div>
+    <script type="text/javascript" src="javascripts/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
   </body>
 </html>
