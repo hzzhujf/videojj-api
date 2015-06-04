@@ -13,5 +13,5 @@ cover: '视频封面，可选 '// 视频封面，可选
 
 ```
 
-### [FQA](http://doc.videojj.com)
+### [FAQ](http://doc.videojj.com)
 
