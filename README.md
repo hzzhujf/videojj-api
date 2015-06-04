@@ -1,6 +1,6 @@
 # videojj-api
 
-### usage
+### USAGE
 ```js
 <link rel="stylesheet" type="text/css" href="Iva.css">
 <script type="text/javascript" src="Iva.js"></script>
