@@ -1,4 +1,5 @@
 # videojj-api
+---
 ### usage
 ```js
 <link rel="stylesheet" type="text/css" href="Iva.css">
@@ -14,6 +15,6 @@ cover: '视频封面，可选 '// 视频封面，可选
 });
 
 ```
----
+
 ### [FQA](http://doc.videojj.com)
 
