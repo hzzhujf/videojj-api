@@ -386,7 +386,7 @@ this["Iva"] =
 	 * 定义开发环境
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(12)], __WEBPACK_AMD_DEFINE_RESULT__ = function (config) {
-		var env = 'dev';//"online" or "dev"
+		var env = 'online';//"online" or "dev"
 		return config[env];
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
@@ -10596,10 +10596,10 @@ this["Iva"] =
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2)
 		, __webpack_require__(11)
 		, __webpack_require__(5)
-		, __webpack_require__(29)
+		, __webpack_require__(27)
+	    , __webpack_require__(28)
+	    , __webpack_require__(29)
 	    , __webpack_require__(30)
-	    , __webpack_require__(31)
-	    , __webpack_require__(32)
 	    , __webpack_require__(13)
 	    , __webpack_require__(1)
 	    , __webpack_require__(15)
@@ -14927,7 +14927,7 @@ this["Iva"] =
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11)
-		, __webpack_require__(27)
+		, __webpack_require__(31)
 		, __webpack_require__(2)
 		, __webpack_require__(1)
 		, __webpack_require__(15)
@@ -15197,7 +15197,7 @@ this["Iva"] =
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11),__webpack_require__(2),__webpack_require__(28)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar,ajax,login) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11),__webpack_require__(2),__webpack_require__(32)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar,ajax,login) {
 	    return function (container,callback,close_callback) {
 	        login(container,callback,close_callback);
 	    }
@@ -18432,7 +18432,7 @@ this["Iva"] =
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        var Base = __webpack_require__(41);
-	        var dashedLineTo = __webpack_require__(45);
+	        var dashedLineTo = __webpack_require__(42);
 	        
 	        /**
 	         * @alias module:zrender/shape/Line
@@ -18528,10 +18528,10 @@ this["Iva"] =
 	        
 	        'use strict';
 
-	        var Clip = __webpack_require__(42);
-	        var color = __webpack_require__(43);
+	        var Clip = __webpack_require__(43);
+	        var color = __webpack_require__(44);
 	        var util = __webpack_require__(34);
-	        var Dispatcher = __webpack_require__(44).Dispatcher;
+	        var Dispatcher = __webpack_require__(45).Dispatcher;
 
 	        var requestAnimationFrame = window.requestAnimationFrame
 	                                    || window.msRequestAnimationFrame
@@ -19130,6 +19130,92 @@ this["Iva"] =
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		var tmpl = '<div class="m-sidebar" style="right:-240px;">\
+					</div>';
+		return tmpl;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (environment) {
+		var tmpl = '<div class="m-head">\
+						<div class="content f-cb">\
+							<div class="avatar">\
+								<a href="'+environment.host+'/public/venvy/app/user.html#/index" target="_blank">\
+									<img src="{{{avatar}}}">\
+								</a>\
+							</div>\
+							<div class="info">\
+								<h2 class="name">{{{name}}}</h2>\
+								<p class="slogan">{{{desc}}}</p>\
+							</div>\
+						</div>\
+						<div class="search">\
+							<input type="text" placeholder="搜索你想要标注的物体"></input>\
+							<p class="hint"><span class="numner">0</span>/<span class="total">12</span></p>\
+						</div>\
+					</div>';
+		return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(30)], __WEBPACK_AMD_DEFINE_RESULT__ = function (dgList) {
+		var tmpl = '<div class="m-body">\
+						<div class="list">\
+							{{#if isLogined}}\
+							<ol>' + dgList + '</ol>\
+							<div class="more">\
+								{{#if dgList.[length]}}\
+								<a href="javascript:void(0);">点击加载更多...</a>\
+								{{else}}\
+								没有收藏的云窗\
+								{{/if}}\
+							</div>\
+							{{else}}\
+							<div class="note">请先<a>登录</a>，查看云窗信息</div>\
+							{{/if}}\
+						</div>\
+					</div>';
+		return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		var tmpl = '{{#each dgList}}\
+						<li data-id="{{{_id}}}">\
+							<div class="picture">\
+								<img src="{{pic.[0].[url]}}">\
+							</div>\
+							<div class="content">\
+								<div class="head">\
+									<h2>{{{title}}}</h2>\
+									{{#if isFav}}\
+									<span class="ivaiconfont">&#xe6b7;</span>\
+									{{/if}}\
+								</div>\
+								<div class="detail">\
+									<p>{{{desc}}}</p>\
+								</div>\
+							</div>\
+							<div class="mask">点击引用</div>\
+						</li>\
+					{{/each}}';
+		return tmpl;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (environment) {
 		var tmpl = '<div class="m-dgmask" style="display:none;">\
 						<div class="m-dgshow">\
@@ -19201,7 +19287,7 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 28 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(47),__webpack_require__(8),__webpack_require__(48),__webpack_require__(49),__webpack_require__(4),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,regester,iva_alert,validator,flash,environment,$) {
@@ -19289,92 +19375,6 @@ this["Iva"] =
 	        });
 	    }
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-		var tmpl = '<div class="m-sidebar" style="right:-240px;">\
-					</div>';
-		return tmpl;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (environment) {
-		var tmpl = '<div class="m-head">\
-						<div class="content f-cb">\
-							<div class="avatar">\
-								<a href="'+environment.host+'/public/venvy/app/user.html#/index" target="_blank">\
-									<img src="{{{avatar}}}">\
-								</a>\
-							</div>\
-							<div class="info">\
-								<h2 class="name">{{{name}}}</h2>\
-								<p class="slogan">{{{desc}}}</p>\
-							</div>\
-						</div>\
-						<div class="search">\
-							<input type="text" placeholder="搜索你想要标注的物体"></input>\
-							<p class="hint"><span class="numner">0</span>/<span class="total">12</span></p>\
-						</div>\
-					</div>';
-		return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(32)], __WEBPACK_AMD_DEFINE_RESULT__ = function (dgList) {
-		var tmpl = '<div class="m-body">\
-						<div class="list">\
-							{{#if isLogined}}\
-							<ol>' + dgList + '</ol>\
-							<div class="more">\
-								{{#if dgList.[length]}}\
-								<a href="javascript:void(0);">点击加载更多...</a>\
-								{{else}}\
-								没有收藏的云窗\
-								{{/if}}\
-							</div>\
-							{{else}}\
-							<div class="note">请先<a>登录</a>，查看云窗信息</div>\
-							{{/if}}\
-						</div>\
-					</div>';
-		return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-		var tmpl = '{{#each dgList}}\
-						<li data-id="{{{_id}}}">\
-							<div class="picture">\
-								<img src="{{pic.[0].[url]}}">\
-							</div>\
-							<div class="content">\
-								<div class="head">\
-									<h2>{{{title}}}</h2>\
-									{{#if isFav}}\
-									<span class="ivaiconfont">&#xe6b7;</span>\
-									{{/if}}\
-								</div>\
-								<div class="detail">\
-									<p>{{{desc}}}</p>\
-								</div>\
-							</div>\
-							<div class="mask">点击引用</div>\
-						</li>\
-					{{/each}}';
-		return tmpl;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
 /* 33 */
@@ -21157,13 +21157,13 @@ this["Iva"] =
 
 	        var config = __webpack_require__(50);
 	        var env = __webpack_require__(40);
-	        var eventTool = __webpack_require__(44);
+	        var eventTool = __webpack_require__(45);
 	        var util = __webpack_require__(34);
-	        var vec2 = __webpack_require__(54);
-	        var mat2d = __webpack_require__(55);
+	        var vec2 = __webpack_require__(51);
+	        var mat2d = __webpack_require__(52);
 	        var EVENT = config.EVENT;
 
-	        var Eventful = __webpack_require__(56);
+	        var Eventful = __webpack_require__(53);
 
 	        var domHandlerNames = [
 	            'resize', 'click', 'dblclick',
@@ -22119,9 +22119,9 @@ this["Iva"] =
 	        // var vec2 = require('./tool/vector');
 	        var log = __webpack_require__(35);
 	        // var matrix = require('./tool/matrix');
-	        var BaseLoadingEffect = __webpack_require__(51);
+	        var BaseLoadingEffect = __webpack_require__(54);
 
-	        var Layer = __webpack_require__(52);
+	        var Layer = __webpack_require__(55);
 
 	        // 返回false的方法，用于避免页面被选中
 	        function returnFalse() {
@@ -22868,7 +22868,7 @@ this["Iva"] =
 	                shape.brush(ctx, false);
 	            }
 
-	            var ImageShape = __webpack_require__(53);
+	            var ImageShape = __webpack_require__(56);
 	            var imgShape = new ImageShape({
 	                id : id,
 	                style : {
@@ -23461,13 +23461,13 @@ this["Iva"] =
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	        var vmlCanvasManager = window['G_vmlCanvasManager'];
 
-	        var matrix = __webpack_require__(55);
+	        var matrix = __webpack_require__(52);
 	        var guid = __webpack_require__(36);
 	        var util = __webpack_require__(34);
 	        var log = __webpack_require__(35);
 
 	        var Transformable = __webpack_require__(58);
-	        var Eventful = __webpack_require__(56);
+	        var Eventful = __webpack_require__(53);
 
 	        function _fillText(ctx, text, x, y, textFont, textAlign, textBaseline) {
 	            if (textFont) {
@@ -23803,7 +23803,7 @@ this["Iva"] =
 	                newStyle[k] = style[k];
 	            }
 
-	            var color = __webpack_require__(43);
+	            var color = __webpack_require__(44);
 	            var highlightColor = color.getHighlightColor();
 	            // 根据highlightStyle扩展
 	            if (style.brushType != 'stroke') {
@@ -24100,6 +24100,60 @@ this["Iva"] =
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * 虚线lineTo 
+	 *
+	 * author:  Kener (@Kener-林峰, kener.linfeng@gmail.com)
+	 *          errorrik (errorrik@gmail.com)
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (/* require */) {
+
+	        var dashPattern = [ 5, 5 ];
+	        /**
+	         * 虚线lineTo 
+	         */
+	        return function (ctx, x1, y1, x2, y2, dashLength) {
+	            // http://msdn.microsoft.com/en-us/library/ie/dn265063(v=vs.85).aspx
+	            if (ctx.setLineDash) {
+	                dashPattern[0] = dashPattern[1] = dashLength;
+	                ctx.setLineDash(dashPattern);
+	                ctx.moveTo(x1, y1);
+	                ctx.lineTo(x2, y2);
+	                return;
+	            }
+
+	            dashLength = typeof dashLength != 'number'
+	                            ? 5 
+	                            : dashLength;
+
+	            var dx = x2 - x1;
+	            var dy = y2 - y1;
+	            var numDashes = Math.floor(
+	                Math.sqrt(dx * dx + dy * dy) / dashLength
+	            );
+	            dx = dx / numDashes;
+	            dy = dy / numDashes;
+	            var flag = true;
+	            for (var i = 0; i < numDashes; ++i) {
+	                if (flag) {
+	                    ctx.moveTo(x1, y1);
+	                }
+	                else {
+	                    ctx.lineTo(x1, y1);
+	                }
+	                flag = !flag;
+	                x1 += dx;
+	                y1 += dy;
+	            }
+	            ctx.lineTo(x2, y2);
+	        };
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 43 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * 动画主控制器
 	 * @config target 动画对象，可以是数组，如果是数组的话会批量分发onframe等事件
 	 * @config life(1000) 动画时长
@@ -24204,7 +24258,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -25284,7 +25338,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -25296,7 +25350,7 @@ this["Iva"] =
 
 	        'use strict';
 
-	        var Eventful = __webpack_require__(56);
+	        var Eventful = __webpack_require__(53);
 
 	        /**
 	        * 提取鼠标（手指）x坐标
@@ -25365,64 +25419,10 @@ this["Iva"] =
 
 
 /***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * 虚线lineTo 
-	 *
-	 * author:  Kener (@Kener-林峰, kener.linfeng@gmail.com)
-	 *          errorrik (errorrik@gmail.com)
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (/* require */) {
-
-	        var dashPattern = [ 5, 5 ];
-	        /**
-	         * 虚线lineTo 
-	         */
-	        return function (ctx, x1, y1, x2, y2, dashLength) {
-	            // http://msdn.microsoft.com/en-us/library/ie/dn265063(v=vs.85).aspx
-	            if (ctx.setLineDash) {
-	                dashPattern[0] = dashPattern[1] = dashLength;
-	                ctx.setLineDash(dashPattern);
-	                ctx.moveTo(x1, y1);
-	                ctx.lineTo(x2, y2);
-	                return;
-	            }
-
-	            dashLength = typeof dashLength != 'number'
-	                            ? 5 
-	                            : dashLength;
-
-	            var dx = x2 - x1;
-	            var dy = y2 - y1;
-	            var numDashes = Math.floor(
-	                Math.sqrt(dx * dx + dy * dy) / dashLength
-	            );
-	            dx = dx / numDashes;
-	            dy = dy / numDashes;
-	            var flag = true;
-	            for (var i = 0; i < numDashes; ++i) {
-	                if (flag) {
-	                    ctx.moveTo(x1, y1);
-	                }
-	                else {
-	                    ctx.lineTo(x1, y1);
-	                }
-	                flag = !flag;
-	                x1 += dx;
-	                y1 += dy;
-	            }
-	            ctx.lineTo(x2, y2);
-	        };
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(62),__webpack_require__(63),__webpack_require__(64)], __WEBPACK_AMD_DEFINE_RESULT__ = function (login,regester,success) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(61),__webpack_require__(62),__webpack_require__(63)], __WEBPACK_AMD_DEFINE_RESULT__ = function (login,regester,success) {
 	    return function (inside) {
 	        var tmpl 
 	        if (inside == 'login'){
@@ -25440,7 +25440,7 @@ this["Iva"] =
 /* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(28),__webpack_require__(61),__webpack_require__(8),__webpack_require__(48),__webpack_require__(49),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,login,success,iva_alert,validator,flash,$) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(32),__webpack_require__(64),__webpack_require__(8),__webpack_require__(48),__webpack_require__(49),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,login,success,iva_alert,validator,flash,$) {
 	    return function (container,callback,close_callback) {
 	        var $regester = $(handlebar.compile(logWindow_tmp('regester'))());
 	        container.before($regester);
@@ -25500,7 +25500,7 @@ this["Iva"] =
 	        $login.click(function(){
 	            $regester.fadeOut(300,function(){
 	                $regester.remove();
-	                __webpack_require__(28)(container);
+	                __webpack_require__(32)(container);
 	            });
 	        });
 	        $('.close').click(function(){
@@ -26417,591 +26417,6 @@ this["Iva"] =
 /* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * zrender: loading特效类
-	 *
-	 * @author Kener (@Kener-林峰, kener.linfeng@gmail.com)
-	 *         errorrik (errorrik@gmail.com)
-	 */
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
-	        var util = __webpack_require__(34);
-	        var TextShape = __webpack_require__(65);
-	        var RectangleShape = __webpack_require__(66);
-
-
-	        var DEFAULT_TEXT = 'Loading...';
-	        var DEFAULT_TEXT_FONT = 'normal 16px Arial';
-
-	        /**
-	         * @constructor
-	         * 
-	         * @param {Object} options 选项
-	         * @param {color} options.backgroundColor 背景颜色
-	         * @param {Object} options.textStyle 文字样式，同shape/text.style
-	         * @param {number=} options.progress 进度参数，部分特效有用
-	         * @param {Object=} options.effect 特效参数，部分特效有用
-	         * 
-	         * {
-	         *     effect,
-	         *     //loading话术
-	         *     text:'',
-	         *     // 水平安放位置，默认为 'center'，可指定x坐标
-	         *     x:'center' || 'left' || 'right' || {number},
-	         *     // 垂直安放位置，默认为'top'，可指定y坐标
-	         *     y:'top' || 'bottom' || {number},
-	         *
-	         *     textStyle:{
-	         *         textFont: 'normal 20px Arial' || {textFont}, //文本字体
-	         *         color: {color}
-	         *     }
-	         * }
-	         */
-	        function Base(options) {
-	            this.setOptions(options);
-	        }
-
-	        /**
-	         * 创建loading文字图形
-	         * 
-	         * @param {Object} textStyle 文字style，同shape/text.style
-	         */
-	        Base.prototype.createTextShape = function (textStyle) {
-	            return new TextShape({
-	                highlightStyle : util.merge(
-	                    {
-	                        x : this.canvasWidth / 2,
-	                        y : this.canvasHeight / 2,
-	                        text : DEFAULT_TEXT,
-	                        textAlign : 'center',
-	                        textBaseline : 'middle',
-	                        textFont : DEFAULT_TEXT_FONT,
-	                        color: '#333',
-	                        brushType : 'fill'
-	                    },
-	                    textStyle,
-	                    true
-	                )
-	            });
-	        };
-	        
-	        /**
-	         * 获取loading背景图形
-	         * 
-	         * @param {color} color 背景颜色
-	         */
-	        Base.prototype.createBackgroundShape = function (color) {
-	            return new RectangleShape({
-	                highlightStyle : {
-	                    x : 0,
-	                    y : 0,
-	                    width : this.canvasWidth,
-	                    height : this.canvasHeight,
-	                    brushType : 'fill',
-	                    color : color
-	                }
-	            });
-	        };
-
-	        Base.prototype.start = function (painter) {
-	            this.canvasWidth = painter._width;
-	            this.canvasHeight = painter._height;
-
-	            function addShapeHandle(param) {
-	                painter.storage.addHover(param);
-	            }
-	            function refreshHandle() {
-	                painter.refreshHover();
-	            }
-	            this.loadingTimer = this._start(addShapeHandle, refreshHandle);
-	        };
-
-	        Base.prototype._start = function (/*addShapeHandle, refreshHandle*/) {
-	            return setInterval(function () {
-	            }, 10000);
-	        };
-
-	        Base.prototype.stop = function () {
-	            clearInterval(this.loadingTimer);
-	        };
-
-	        Base.prototype.setOptions = function (options) {
-	            this.options = options || {};
-	        };
-	        
-	        Base.prototype.adjust = function (value, region) {
-	            if (value <= region[0]) {
-	                value = region[0];
-	            }
-	            else if (value >= region[1]) {
-	                value = region[1];
-	            }
-	            return value;
-	        };
-	        
-	        Base.prototype.getLocation = function(loc, totalWidth, totalHeight) {
-	            var x = loc.x != null ? loc.x : 'center';
-	            switch (x) {
-	                case 'center' :
-	                    x = Math.floor((this.canvasWidth - totalWidth) / 2);
-	                    break;
-	                case 'left' :
-	                    x = 0;
-	                    break;
-	                case 'right' :
-	                    x = this.canvasWidth - totalWidth;
-	                    break;
-	            }
-	            var y = loc.y != null ? loc.y : 'center';
-	            switch (y) {
-	                case 'center' :
-	                    y = Math.floor((this.canvasHeight - totalHeight) / 2);
-	                    break;
-	                case 'top' :
-	                    y = 0;
-	                    break;
-	                case 'bottom' :
-	                    y = this.canvasHeight - totalHeight;
-	                    break;
-	            }
-	            return {
-	                x : x,
-	                y : y,
-	                width : totalWidth,
-	                height : totalHeight
-	            };
-	        };
-
-	        return Base;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * @module zrender/Layer
-	 * @author pissang(https://www.github.com/pissang)
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	    var Transformable = __webpack_require__(58);
-	    var util = __webpack_require__(34);
-	    var vmlCanvasManager = window['G_vmlCanvasManager'];
-	    var config = __webpack_require__(50);
-
-	    function returnFalse() {
-	        return false;
-	    }
-
-	    /**
-	     * 创建dom
-	     * 
-	     * @inner
-	     * @param {string} id dom id 待用
-	     * @param {string} type dom type，such as canvas, div etc.
-	     * @param {Painter} painter painter instance
-	     */
-	    function createDom(id, type, painter) {
-	        var newDom = document.createElement(type);
-	        var width = painter.getWidth();
-	        var height = painter.getHeight();
-
-	        // 没append呢，请原谅我这样写，清晰~
-	        newDom.style.position = 'absolute';
-	        newDom.style.left = 0;
-	        newDom.style.top = 0;
-	        newDom.style.width = width + 'px';
-	        newDom.style.height = height + 'px';
-	        newDom.width = width * config.devicePixelRatio;
-	        newDom.height = height * config.devicePixelRatio;
-
-	        // id不作为索引用，避免可能造成的重名，定义为私有属性
-	        newDom.setAttribute('data-zr-dom-id', id);
-	        return newDom;
-	    }
-
-	    /**
-	     * @alias module:zrender/Layer
-	     * @constructor
-	     * @extends module:zrender/mixin/Transformable
-	     * @param {string} id
-	     * @param {module:zrender/Painter} painter
-	     */
-	    var Layer = function(id, painter) {
-
-	        this.id = id;
-
-	        this.dom = createDom(id, 'canvas', painter);
-	        this.dom.onselectstart = returnFalse; // 避免页面选中的尴尬
-	        this.dom.style['-webkit-user-select'] = 'none';
-	        this.dom.style['user-select'] = 'none';
-	        this.dom.style['-webkit-touch-callout'] = 'none';
-	        this.dom.style['-webkit-tap-highlight-color'] = 'rgba(0,0,0,0)';
-
-	        vmlCanvasManager && vmlCanvasManager.initElement(this.dom);
-
-	        this.domBack = null;
-	        this.ctxBack = null;
-
-	        this.painter = painter;
-
-	        this.unusedCount = 0;
-
-	        this.config = null;
-
-	        this.dirty = true;
-
-	        this.elCount = 0;
-
-	        // Configs
-	        /**
-	         * 每次清空画布的颜色
-	         * @type {string}
-	         * @default 0
-	         */
-	        this.clearColor = 0;
-	        /**
-	         * 是否开启动态模糊
-	         * @type {boolean}
-	         * @default false
-	         */
-	        this.motionBlur = false;
-	        /**
-	         * 在开启动态模糊的时候使用，与上一帧混合的alpha值，值越大尾迹越明显
-	         * @type {number}
-	         * @default 0.7
-	         */
-	        this.lastFrameAlpha = 0.7;
-	        /**
-	         * 层是否支持鼠标平移操作
-	         * @type {boolean}
-	         * @default false
-	         */
-	        this.zoomable = false;
-	        /**
-	         * 层是否支持鼠标缩放操作
-	         * @type {boolean}
-	         * @default false
-	         */
-	        this.panable = false;
-
-	        this.maxZoom = Infinity;
-	        this.minZoom = 0;
-
-	        Transformable.call(this);
-	    };
-
-	    Layer.prototype.initContext = function () {
-	        this.ctx = this.dom.getContext('2d');
-
-	        var dpr = config.devicePixelRatio;
-	        if (dpr != 1) { 
-	            this.ctx.scale(dpr, dpr);
-	        }
-	    };
-
-	    Layer.prototype.createBackBuffer = function () {
-	        if (vmlCanvasManager) { // IE 8- should not support back buffer
-	            return;
-	        }
-	        this.domBack = createDom('back-' + this.id, 'canvas', this.painter);
-	        this.ctxBack = this.domBack.getContext('2d');
-
-	        var dpr = config.devicePixelRatio;
-
-	        if (dpr != 1) { 
-	            this.ctxBack.scale(dpr, dpr);
-	        }
-	    };
-
-	    /**
-	     * @param  {number} width
-	     * @param  {number} height
-	     */
-	    Layer.prototype.resize = function (width, height) {
-	        var dpr = config.devicePixelRatio;
-
-	        this.dom.style.width = width + 'px';
-	        this.dom.style.height = height + 'px';
-
-	        this.dom.setAttribute('width', width * dpr);
-	        this.dom.setAttribute('height', height * dpr);
-
-	        if (dpr != 1) { 
-	            this.ctx.scale(dpr, dpr);
-	        }
-
-	        if (this.domBack) {
-	            this.domBack.setAttribute('width', width * dpr);
-	            this.domBack.setAttribute('height', height * dpr);
-
-	            if (dpr != 1) { 
-	                this.ctxBack.scale(dpr, dpr);
-	            }
-	        }
-	    };
-
-	    /**
-	     * 清空该层画布
-	     */
-	    Layer.prototype.clear = function () {
-	        var dom = this.dom;
-	        var ctx = this.ctx;
-	        var width = dom.width;
-	        var height = dom.height;
-
-	        var haveClearColor = this.clearColor && !vmlCanvasManager;
-	        var haveMotionBLur = this.motionBlur && !vmlCanvasManager;
-	        var lastFrameAlpha = this.lastFrameAlpha;
-	        
-	        var dpr = config.devicePixelRatio;
-
-	        if (haveMotionBLur) {
-	            if (!this.domBack) {
-	                this.createBackBuffer();
-	            } 
-
-	            this.ctxBack.globalCompositeOperation = 'copy';
-	            this.ctxBack.drawImage(
-	                dom, 0, 0,
-	                width / dpr,
-	                height / dpr
-	            );
-	        }
-
-	        ctx.clearRect(0, 0, width / dpr, height / dpr);
-	        if (haveClearColor) {
-	            ctx.save();
-	            ctx.fillStyle = this.clearColor;
-	            ctx.fillRect(0, 0, width / dpr, height / dpr);
-	            ctx.restore();
-	        }
-
-	        if (haveMotionBLur) {
-	            var domBack = this.domBack;
-	            ctx.save();
-	            ctx.globalAlpha = lastFrameAlpha;
-	            ctx.drawImage(domBack, 0, 0, width / dpr, height / dpr);
-	            ctx.restore();
-	        }
-	    };
-
-	    util.merge(Layer.prototype, Transformable.prototype);
-
-	    return Layer;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * 图片绘制
-	 * @module zrender/shape/Image
-	 * @author pissang(https://www.github.com/pissang)
-	 * @example
-	 *     var ImageShape = require('zrender/shape/Image');
-	 *     var image = new ImageShape({
-	 *         style: {
-	 *             image: 'test.jpg',
-	 *             x: 100,
-	 *             y: 100
-	 *         }
-	 *     });
-	 *     zr.addShape(image);
-	 */
-
-	/**
-	 * @typedef {Object} IImageStyle
-	 * @property {string|HTMLImageElement|HTMLCanvasElement} image 图片url或者图片对象
-	 * @property {number} x 左上角横坐标
-	 * @property {number} y 左上角纵坐标
-	 * @property {number} [width] 绘制到画布上的宽度，默认为图片宽度
-	 * @property {number} [height] 绘制到画布上的高度，默认为图片高度
-	 * @property {number} [sx=0] 从图片中裁剪的左上角横坐标
-	 * @property {number} [sy=0] 从图片中裁剪的左上角纵坐标
-	 * @property {number} [sWidth] 从图片中裁剪的宽度，默认为图片高度
-	 * @property {number} [sHeight] 从图片中裁剪的高度，默认为图片高度
-	 * @property {number} [opacity=1] 绘制透明度
-	 * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
-	 * @property {string} [shadowColor='#000000'] 阴影颜色
-	 * @property {number} [shadowOffsetX=0] 阴影横向偏移
-	 * @property {number} [shadowOffsetY=0] 阴影纵向偏移
-	 * @property {string} [text] 图形中的附加文本
-	 * @property {string} [textColor='#000000'] 文本颜色
-	 * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
-	 * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
-	 * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
-	 *                                可以是start, end, left, right, center
-	 * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
-	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	        var Base = __webpack_require__(41);
-
-	        /**
-	         * @alias zrender/shape/Image
-	         * @constructor
-	         * @extends module:zrender/shape/Base
-	         * @param {Object} options
-	         */
-	        var ZImage = function(options) {
-	            Base.call(this, options);
-	            /**
-	             * 图片绘制样式
-	             * @name module:zrender/shape/Image#style
-	             * @type {module:zrender/shape/Image~IImageStyle}
-	             */
-	            /**
-	             * 图片高亮绘制样式
-	             * @name module:zrender/shape/Image#highlightStyle
-	             * @type {module:zrender/shape/Image~IImageStyle}
-	             */
-	        };
-
-	        ZImage.prototype = {
-	            
-	            type: 'image',
-
-	            brush : function(ctx, isHighlight, refreshNextFrame) {
-	                var style = this.style || {};
-
-	                if (isHighlight) {
-	                    // 根据style扩展默认高亮样式
-	                    style = this.getHighlightStyle(
-	                        style, this.highlightStyle || {}
-	                    );
-	                }
-
-	                var image = style.image;
-	                var self = this;
-
-	                if (!this._imageCache) {
-	                    this._imageCache = {};
-	                }
-	                if (typeof(image) === 'string') {
-	                    var src = image;
-	                    if (this._imageCache[src]) {
-	                        image = this._imageCache[src];
-	                    } else {
-	                        image = new Image();
-	                        image.onload = function () {
-	                            image.onload = null;
-	                            self.modSelf();
-	                            refreshNextFrame();
-	                        };
-
-	                        image.src = src;
-	                        this._imageCache[src] = image;
-	                    }
-	                }
-	                if (image) {
-	                    // 图片已经加载完成
-	                    if (image.nodeName.toUpperCase() == 'IMG') {
-	                        if (window.ActiveXObject) {
-	                            if (image.readyState != 'complete') {
-	                                return;
-	                            }
-	                        }
-	                        else {
-	                            if (!image.complete) {
-	                                return;
-	                            }
-	                        }
-	                    }
-	                    // Else is canvas
-	                    var width = style.width || image.width;
-	                    var height = style.height || image.height;
-	                    var x = style.x;
-	                    var y = style.y;
-	                    // 图片加载失败
-	                    if (!image.width || !image.height) {
-	                        return;
-	                    }
-
-	                    ctx.save();
-
-	                    this.doClip(ctx);
-
-	                    this.setContext(ctx, style);
-
-	                    // 设置transform
-	                    this.setTransform(ctx);
-
-	                    if (style.sWidth && style.sHeight) {
-	                        var sx = style.sx || 0;
-	                        var sy = style.sy || 0;
-	                        ctx.drawImage(
-	                            image,
-	                            sx, sy, style.sWidth, style.sHeight,
-	                            x, y, width, height
-	                        );
-	                    }
-	                    else if (style.sx && style.sy) {
-	                        var sx = style.sx;
-	                        var sy = style.sy;
-	                        var sWidth = width - sx;
-	                        var sHeight = height - sy;
-	                        ctx.drawImage(
-	                            image,
-	                            sx, sy, sWidth, sHeight,
-	                            x, y, width, height
-	                        );
-	                    }
-	                    else {
-	                        ctx.drawImage(image, x, y, width, height);
-	                    }
-	                    // 如果没设置宽和高的话自动根据图片宽高设置
-	                    if (!style.width) {
-	                        style.width = width;
-	                    }
-	                    if (!style.height) {
-	                        style.height = height;
-	                    }
-	                    if (!this.style.width) {
-	                        this.style.width = width;
-	                    }
-	                    if (!this.style.height) {
-	                        this.style.height = height;
-	                    }
-
-	                    this.drawText(ctx, style, this.style);
-
-	                    ctx.restore();
-	                }
-	            },
-
-	            /**
-	             * 计算返回图片的包围盒矩形
-	             * @param {module:zrender/shape/Image~IImageStyle} style
-	             * @return {module:zrender/shape/Base~IBoundingRect}
-	             */
-	            getRect: function(style) {
-	                return {
-	                    x : style.x,
-	                    y : style.y,
-	                    width : style.width,
-	                    height : style.height
-	                };
-	            },
-
-	            clearCache: function() {
-	                this._imageCache = {};
-	            }
-	        };
-
-	        __webpack_require__(34).inherits(ZImage, Base);
-	        return ZImage;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 	        var ArrayCtor = typeof Float32Array === 'undefined'
 	            ? Array
@@ -27281,7 +26696,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 55 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -27457,7 +26872,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 56 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -27730,6 +27145,591 @@ this["Iva"] =
 
 
 /***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * zrender: loading特效类
+	 *
+	 * @author Kener (@Kener-林峰, kener.linfeng@gmail.com)
+	 *         errorrik (errorrik@gmail.com)
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
+	        var util = __webpack_require__(34);
+	        var TextShape = __webpack_require__(65);
+	        var RectangleShape = __webpack_require__(66);
+
+
+	        var DEFAULT_TEXT = 'Loading...';
+	        var DEFAULT_TEXT_FONT = 'normal 16px Arial';
+
+	        /**
+	         * @constructor
+	         * 
+	         * @param {Object} options 选项
+	         * @param {color} options.backgroundColor 背景颜色
+	         * @param {Object} options.textStyle 文字样式，同shape/text.style
+	         * @param {number=} options.progress 进度参数，部分特效有用
+	         * @param {Object=} options.effect 特效参数，部分特效有用
+	         * 
+	         * {
+	         *     effect,
+	         *     //loading话术
+	         *     text:'',
+	         *     // 水平安放位置，默认为 'center'，可指定x坐标
+	         *     x:'center' || 'left' || 'right' || {number},
+	         *     // 垂直安放位置，默认为'top'，可指定y坐标
+	         *     y:'top' || 'bottom' || {number},
+	         *
+	         *     textStyle:{
+	         *         textFont: 'normal 20px Arial' || {textFont}, //文本字体
+	         *         color: {color}
+	         *     }
+	         * }
+	         */
+	        function Base(options) {
+	            this.setOptions(options);
+	        }
+
+	        /**
+	         * 创建loading文字图形
+	         * 
+	         * @param {Object} textStyle 文字style，同shape/text.style
+	         */
+	        Base.prototype.createTextShape = function (textStyle) {
+	            return new TextShape({
+	                highlightStyle : util.merge(
+	                    {
+	                        x : this.canvasWidth / 2,
+	                        y : this.canvasHeight / 2,
+	                        text : DEFAULT_TEXT,
+	                        textAlign : 'center',
+	                        textBaseline : 'middle',
+	                        textFont : DEFAULT_TEXT_FONT,
+	                        color: '#333',
+	                        brushType : 'fill'
+	                    },
+	                    textStyle,
+	                    true
+	                )
+	            });
+	        };
+	        
+	        /**
+	         * 获取loading背景图形
+	         * 
+	         * @param {color} color 背景颜色
+	         */
+	        Base.prototype.createBackgroundShape = function (color) {
+	            return new RectangleShape({
+	                highlightStyle : {
+	                    x : 0,
+	                    y : 0,
+	                    width : this.canvasWidth,
+	                    height : this.canvasHeight,
+	                    brushType : 'fill',
+	                    color : color
+	                }
+	            });
+	        };
+
+	        Base.prototype.start = function (painter) {
+	            this.canvasWidth = painter._width;
+	            this.canvasHeight = painter._height;
+
+	            function addShapeHandle(param) {
+	                painter.storage.addHover(param);
+	            }
+	            function refreshHandle() {
+	                painter.refreshHover();
+	            }
+	            this.loadingTimer = this._start(addShapeHandle, refreshHandle);
+	        };
+
+	        Base.prototype._start = function (/*addShapeHandle, refreshHandle*/) {
+	            return setInterval(function () {
+	            }, 10000);
+	        };
+
+	        Base.prototype.stop = function () {
+	            clearInterval(this.loadingTimer);
+	        };
+
+	        Base.prototype.setOptions = function (options) {
+	            this.options = options || {};
+	        };
+	        
+	        Base.prototype.adjust = function (value, region) {
+	            if (value <= region[0]) {
+	                value = region[0];
+	            }
+	            else if (value >= region[1]) {
+	                value = region[1];
+	            }
+	            return value;
+	        };
+	        
+	        Base.prototype.getLocation = function(loc, totalWidth, totalHeight) {
+	            var x = loc.x != null ? loc.x : 'center';
+	            switch (x) {
+	                case 'center' :
+	                    x = Math.floor((this.canvasWidth - totalWidth) / 2);
+	                    break;
+	                case 'left' :
+	                    x = 0;
+	                    break;
+	                case 'right' :
+	                    x = this.canvasWidth - totalWidth;
+	                    break;
+	            }
+	            var y = loc.y != null ? loc.y : 'center';
+	            switch (y) {
+	                case 'center' :
+	                    y = Math.floor((this.canvasHeight - totalHeight) / 2);
+	                    break;
+	                case 'top' :
+	                    y = 0;
+	                    break;
+	                case 'bottom' :
+	                    y = this.canvasHeight - totalHeight;
+	                    break;
+	            }
+	            return {
+	                x : x,
+	                y : y,
+	                width : totalWidth,
+	                height : totalHeight
+	            };
+	        };
+
+	        return Base;
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @module zrender/Layer
+	 * @author pissang(https://www.github.com/pissang)
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    var Transformable = __webpack_require__(58);
+	    var util = __webpack_require__(34);
+	    var vmlCanvasManager = window['G_vmlCanvasManager'];
+	    var config = __webpack_require__(50);
+
+	    function returnFalse() {
+	        return false;
+	    }
+
+	    /**
+	     * 创建dom
+	     * 
+	     * @inner
+	     * @param {string} id dom id 待用
+	     * @param {string} type dom type，such as canvas, div etc.
+	     * @param {Painter} painter painter instance
+	     */
+	    function createDom(id, type, painter) {
+	        var newDom = document.createElement(type);
+	        var width = painter.getWidth();
+	        var height = painter.getHeight();
+
+	        // 没append呢，请原谅我这样写，清晰~
+	        newDom.style.position = 'absolute';
+	        newDom.style.left = 0;
+	        newDom.style.top = 0;
+	        newDom.style.width = width + 'px';
+	        newDom.style.height = height + 'px';
+	        newDom.width = width * config.devicePixelRatio;
+	        newDom.height = height * config.devicePixelRatio;
+
+	        // id不作为索引用，避免可能造成的重名，定义为私有属性
+	        newDom.setAttribute('data-zr-dom-id', id);
+	        return newDom;
+	    }
+
+	    /**
+	     * @alias module:zrender/Layer
+	     * @constructor
+	     * @extends module:zrender/mixin/Transformable
+	     * @param {string} id
+	     * @param {module:zrender/Painter} painter
+	     */
+	    var Layer = function(id, painter) {
+
+	        this.id = id;
+
+	        this.dom = createDom(id, 'canvas', painter);
+	        this.dom.onselectstart = returnFalse; // 避免页面选中的尴尬
+	        this.dom.style['-webkit-user-select'] = 'none';
+	        this.dom.style['user-select'] = 'none';
+	        this.dom.style['-webkit-touch-callout'] = 'none';
+	        this.dom.style['-webkit-tap-highlight-color'] = 'rgba(0,0,0,0)';
+
+	        vmlCanvasManager && vmlCanvasManager.initElement(this.dom);
+
+	        this.domBack = null;
+	        this.ctxBack = null;
+
+	        this.painter = painter;
+
+	        this.unusedCount = 0;
+
+	        this.config = null;
+
+	        this.dirty = true;
+
+	        this.elCount = 0;
+
+	        // Configs
+	        /**
+	         * 每次清空画布的颜色
+	         * @type {string}
+	         * @default 0
+	         */
+	        this.clearColor = 0;
+	        /**
+	         * 是否开启动态模糊
+	         * @type {boolean}
+	         * @default false
+	         */
+	        this.motionBlur = false;
+	        /**
+	         * 在开启动态模糊的时候使用，与上一帧混合的alpha值，值越大尾迹越明显
+	         * @type {number}
+	         * @default 0.7
+	         */
+	        this.lastFrameAlpha = 0.7;
+	        /**
+	         * 层是否支持鼠标平移操作
+	         * @type {boolean}
+	         * @default false
+	         */
+	        this.zoomable = false;
+	        /**
+	         * 层是否支持鼠标缩放操作
+	         * @type {boolean}
+	         * @default false
+	         */
+	        this.panable = false;
+
+	        this.maxZoom = Infinity;
+	        this.minZoom = 0;
+
+	        Transformable.call(this);
+	    };
+
+	    Layer.prototype.initContext = function () {
+	        this.ctx = this.dom.getContext('2d');
+
+	        var dpr = config.devicePixelRatio;
+	        if (dpr != 1) { 
+	            this.ctx.scale(dpr, dpr);
+	        }
+	    };
+
+	    Layer.prototype.createBackBuffer = function () {
+	        if (vmlCanvasManager) { // IE 8- should not support back buffer
+	            return;
+	        }
+	        this.domBack = createDom('back-' + this.id, 'canvas', this.painter);
+	        this.ctxBack = this.domBack.getContext('2d');
+
+	        var dpr = config.devicePixelRatio;
+
+	        if (dpr != 1) { 
+	            this.ctxBack.scale(dpr, dpr);
+	        }
+	    };
+
+	    /**
+	     * @param  {number} width
+	     * @param  {number} height
+	     */
+	    Layer.prototype.resize = function (width, height) {
+	        var dpr = config.devicePixelRatio;
+
+	        this.dom.style.width = width + 'px';
+	        this.dom.style.height = height + 'px';
+
+	        this.dom.setAttribute('width', width * dpr);
+	        this.dom.setAttribute('height', height * dpr);
+
+	        if (dpr != 1) { 
+	            this.ctx.scale(dpr, dpr);
+	        }
+
+	        if (this.domBack) {
+	            this.domBack.setAttribute('width', width * dpr);
+	            this.domBack.setAttribute('height', height * dpr);
+
+	            if (dpr != 1) { 
+	                this.ctxBack.scale(dpr, dpr);
+	            }
+	        }
+	    };
+
+	    /**
+	     * 清空该层画布
+	     */
+	    Layer.prototype.clear = function () {
+	        var dom = this.dom;
+	        var ctx = this.ctx;
+	        var width = dom.width;
+	        var height = dom.height;
+
+	        var haveClearColor = this.clearColor && !vmlCanvasManager;
+	        var haveMotionBLur = this.motionBlur && !vmlCanvasManager;
+	        var lastFrameAlpha = this.lastFrameAlpha;
+	        
+	        var dpr = config.devicePixelRatio;
+
+	        if (haveMotionBLur) {
+	            if (!this.domBack) {
+	                this.createBackBuffer();
+	            } 
+
+	            this.ctxBack.globalCompositeOperation = 'copy';
+	            this.ctxBack.drawImage(
+	                dom, 0, 0,
+	                width / dpr,
+	                height / dpr
+	            );
+	        }
+
+	        ctx.clearRect(0, 0, width / dpr, height / dpr);
+	        if (haveClearColor) {
+	            ctx.save();
+	            ctx.fillStyle = this.clearColor;
+	            ctx.fillRect(0, 0, width / dpr, height / dpr);
+	            ctx.restore();
+	        }
+
+	        if (haveMotionBLur) {
+	            var domBack = this.domBack;
+	            ctx.save();
+	            ctx.globalAlpha = lastFrameAlpha;
+	            ctx.drawImage(domBack, 0, 0, width / dpr, height / dpr);
+	            ctx.restore();
+	        }
+	    };
+
+	    util.merge(Layer.prototype, Transformable.prototype);
+
+	    return Layer;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * 图片绘制
+	 * @module zrender/shape/Image
+	 * @author pissang(https://www.github.com/pissang)
+	 * @example
+	 *     var ImageShape = require('zrender/shape/Image');
+	 *     var image = new ImageShape({
+	 *         style: {
+	 *             image: 'test.jpg',
+	 *             x: 100,
+	 *             y: 100
+	 *         }
+	 *     });
+	 *     zr.addShape(image);
+	 */
+
+	/**
+	 * @typedef {Object} IImageStyle
+	 * @property {string|HTMLImageElement|HTMLCanvasElement} image 图片url或者图片对象
+	 * @property {number} x 左上角横坐标
+	 * @property {number} y 左上角纵坐标
+	 * @property {number} [width] 绘制到画布上的宽度，默认为图片宽度
+	 * @property {number} [height] 绘制到画布上的高度，默认为图片高度
+	 * @property {number} [sx=0] 从图片中裁剪的左上角横坐标
+	 * @property {number} [sy=0] 从图片中裁剪的左上角纵坐标
+	 * @property {number} [sWidth] 从图片中裁剪的宽度，默认为图片高度
+	 * @property {number} [sHeight] 从图片中裁剪的高度，默认为图片高度
+	 * @property {number} [opacity=1] 绘制透明度
+	 * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+	 * @property {string} [shadowColor='#000000'] 阴影颜色
+	 * @property {number} [shadowOffsetX=0] 阴影横向偏移
+	 * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+	 * @property {string} [text] 图形中的附加文本
+	 * @property {string} [textColor='#000000'] 文本颜色
+	 * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+	 * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+	 * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+	 *                                可以是start, end, left, right, center
+	 * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	        var Base = __webpack_require__(41);
+
+	        /**
+	         * @alias zrender/shape/Image
+	         * @constructor
+	         * @extends module:zrender/shape/Base
+	         * @param {Object} options
+	         */
+	        var ZImage = function(options) {
+	            Base.call(this, options);
+	            /**
+	             * 图片绘制样式
+	             * @name module:zrender/shape/Image#style
+	             * @type {module:zrender/shape/Image~IImageStyle}
+	             */
+	            /**
+	             * 图片高亮绘制样式
+	             * @name module:zrender/shape/Image#highlightStyle
+	             * @type {module:zrender/shape/Image~IImageStyle}
+	             */
+	        };
+
+	        ZImage.prototype = {
+	            
+	            type: 'image',
+
+	            brush : function(ctx, isHighlight, refreshNextFrame) {
+	                var style = this.style || {};
+
+	                if (isHighlight) {
+	                    // 根据style扩展默认高亮样式
+	                    style = this.getHighlightStyle(
+	                        style, this.highlightStyle || {}
+	                    );
+	                }
+
+	                var image = style.image;
+	                var self = this;
+
+	                if (!this._imageCache) {
+	                    this._imageCache = {};
+	                }
+	                if (typeof(image) === 'string') {
+	                    var src = image;
+	                    if (this._imageCache[src]) {
+	                        image = this._imageCache[src];
+	                    } else {
+	                        image = new Image();
+	                        image.onload = function () {
+	                            image.onload = null;
+	                            self.modSelf();
+	                            refreshNextFrame();
+	                        };
+
+	                        image.src = src;
+	                        this._imageCache[src] = image;
+	                    }
+	                }
+	                if (image) {
+	                    // 图片已经加载完成
+	                    if (image.nodeName.toUpperCase() == 'IMG') {
+	                        if (window.ActiveXObject) {
+	                            if (image.readyState != 'complete') {
+	                                return;
+	                            }
+	                        }
+	                        else {
+	                            if (!image.complete) {
+	                                return;
+	                            }
+	                        }
+	                    }
+	                    // Else is canvas
+	                    var width = style.width || image.width;
+	                    var height = style.height || image.height;
+	                    var x = style.x;
+	                    var y = style.y;
+	                    // 图片加载失败
+	                    if (!image.width || !image.height) {
+	                        return;
+	                    }
+
+	                    ctx.save();
+
+	                    this.doClip(ctx);
+
+	                    this.setContext(ctx, style);
+
+	                    // 设置transform
+	                    this.setTransform(ctx);
+
+	                    if (style.sWidth && style.sHeight) {
+	                        var sx = style.sx || 0;
+	                        var sy = style.sy || 0;
+	                        ctx.drawImage(
+	                            image,
+	                            sx, sy, style.sWidth, style.sHeight,
+	                            x, y, width, height
+	                        );
+	                    }
+	                    else if (style.sx && style.sy) {
+	                        var sx = style.sx;
+	                        var sy = style.sy;
+	                        var sWidth = width - sx;
+	                        var sHeight = height - sy;
+	                        ctx.drawImage(
+	                            image,
+	                            sx, sy, sWidth, sHeight,
+	                            x, y, width, height
+	                        );
+	                    }
+	                    else {
+	                        ctx.drawImage(image, x, y, width, height);
+	                    }
+	                    // 如果没设置宽和高的话自动根据图片宽高设置
+	                    if (!style.width) {
+	                        style.width = width;
+	                    }
+	                    if (!style.height) {
+	                        style.height = height;
+	                    }
+	                    if (!this.style.width) {
+	                        this.style.width = width;
+	                    }
+	                    if (!this.style.height) {
+	                        this.style.height = height;
+	                    }
+
+	                    this.drawText(ctx, style, this.style);
+
+	                    ctx.restore();
+	                }
+	            },
+
+	            /**
+	             * 计算返回图片的包围盒矩形
+	             * @param {module:zrender/shape/Image~IImageStyle} style
+	             * @return {module:zrender/shape/Base~IBoundingRect}
+	             */
+	            getRect: function(style) {
+	                return {
+	                    x : style.x,
+	                    y : style.y,
+	                    width : style.width,
+	                    height : style.height
+	                };
+	            },
+
+	            clearCache: function() {
+	                this._imageCache = {};
+	            }
+	        };
+
+	        __webpack_require__(34).inherits(ZImage, Base);
+	        return ZImage;
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
 /* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -27758,7 +27758,7 @@ this["Iva"] =
 	    var util = __webpack_require__(34);
 
 	    var Transformable = __webpack_require__(58);
-	    var Eventful = __webpack_require__(56);
+	    var Eventful = __webpack_require__(53);
 
 	    /**
 	     * @alias module:zrender/Group
@@ -27978,8 +27978,8 @@ this["Iva"] =
 
 	    'use strict';
 
-	    var matrix = __webpack_require__(55);
-	    var vector = __webpack_require__(54);
+	    var matrix = __webpack_require__(52);
+	    var vector = __webpack_require__(51);
 	    var origin = [0, 0];
 
 	    var mTranslate = matrix.translate;
@@ -29440,6 +29440,78 @@ this["Iva"] =
 /* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    var tmpl = "<div class='m-login'>\
+	                    <div class='iconfont exit'>&#xe620</div>\
+	                    <div class='title'>欢 迎 回 来</div>\
+	                    <div class='line'></div>\
+	                    <div class='input-box-container account-input-container'>\
+	                        <input class='input-box account-input' placeholder='请输入邮箱或手机号'>\
+	                        <div class='iconfont input-icon'>&#xe60c</div>\
+	                    </div>\
+	                    <div class='input-box-container passwd-input-container'>\
+	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码'>\
+	                        <div class='iconfont input-icon'>&#xe621</div>\
+	                    </div>\
+	                    <div class='log-text click-text'>\
+	                        <span class='forget log-inside-text'>忘记密码</span>\
+	                        <span class='log-inside-text' style='margin-left:8px;margin-right:8px;cursor:default'>or</span>\
+	                        <span class='regester log-inside-text'>注册</span>\
+	                    </div>\
+	                    <input type='button' class='u-button button login-button' value='登  录'></input>\
+	                </div>";
+	    return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    var tmpl = "<div class='m-regester'>\
+	                    <div class='iconfont exit'>&#xe620</div>\
+	                    <div class='title'>加 入 我 们</div>\
+	                    <div class='line'></div>\
+	                    <div class='input-box-container account-input-container'>\
+	                        <input class='input-box account-input' placeholder='请输入邮箱'>\
+	                        <div class='iconfont input-icon'>&#xe62d</div>\
+	                    </div>\
+	                    <div class='input-box-container passwd-input-container'>\
+	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码,6-30位之间'>\
+	                        <div class='iconfont input-icon'>&#xe621</div>\
+	                    </div>\
+	                    <div class='regester-text click-text'>\
+	                        <span class='login log-inside-text'>有号？一键登录</span>\
+	                    </div>\
+	                    <input type='button' class='u-button button regester-button' value='注 册'></input>\
+	                </div>";
+	    return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 63 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    var tmpl = "<div class='m-success'>\
+	                    <div class='iconfont exit'>&#xe620</div>\
+	                    <div class='title'>注 册 成 功</div>\
+	                    <div class='line'></div>\
+	                    <div class='avatar'>\
+	                        <div class='avatar-inside'></div>\
+	                    </div>\
+	                    <div class='center-text text-up'>恭喜，获得100积分</div>\
+	                    <div class='center-text text-down'>邮箱激活账号获得更多积分</div>\
+	                    <input type='button' class='u-button button active-button' value='Go 激 活 邮 箱'></input>\
+	                    <input type='button' class='u-button button finish-button' value='完 成，继 续 观 看'></input>\
+	                </div>";
+	    return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(8),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,iva_alert,$) {
 	    return function (container,avatar_url,mail,id,callback,close_callback) {
 	        var mailDict = {
@@ -29511,78 +29583,6 @@ this["Iva"] =
 	            });
 	        });
 	    }
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 62 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    var tmpl = "<div class='m-login'>\
-	                    <div class='iconfont exit'>&#xe620</div>\
-	                    <div class='title'>欢 迎 回 来</div>\
-	                    <div class='line'></div>\
-	                    <div class='input-box-container account-input-container'>\
-	                        <input class='input-box account-input' placeholder='请输入邮箱或手机号'>\
-	                        <div class='iconfont input-icon'>&#xe60c</div>\
-	                    </div>\
-	                    <div class='input-box-container passwd-input-container'>\
-	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码'>\
-	                        <div class='iconfont input-icon'>&#xe621</div>\
-	                    </div>\
-	                    <div class='log-text click-text'>\
-	                        <span class='forget log-inside-text'>忘记密码</span>\
-	                        <span class='log-inside-text' style='margin-left:8px;margin-right:8px;cursor:default'>or</span>\
-	                        <span class='regester log-inside-text'>注册</span>\
-	                    </div>\
-	                    <input type='button' class='u-button button login-button' value='登  录'></input>\
-	                </div>";
-	    return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 63 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    var tmpl = "<div class='m-regester'>\
-	                    <div class='iconfont exit'>&#xe620</div>\
-	                    <div class='title'>加 入 我 们</div>\
-	                    <div class='line'></div>\
-	                    <div class='input-box-container account-input-container'>\
-	                        <input class='input-box account-input' placeholder='请输入邮箱'>\
-	                        <div class='iconfont input-icon'>&#xe62d</div>\
-	                    </div>\
-	                    <div class='input-box-container passwd-input-container'>\
-	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码,6-30位之间'>\
-	                        <div class='iconfont input-icon'>&#xe621</div>\
-	                    </div>\
-	                    <div class='regester-text click-text'>\
-	                        <span class='login log-inside-text'>有号？一键登录</span>\
-	                    </div>\
-	                    <input type='button' class='u-button button regester-button' value='注 册'></input>\
-	                </div>";
-	    return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 64 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    var tmpl = "<div class='m-success'>\
-	                    <div class='iconfont exit'>&#xe620</div>\
-	                    <div class='title'>注 册 成 功</div>\
-	                    <div class='line'></div>\
-	                    <div class='avatar'>\
-	                        <div class='avatar-inside'></div>\
-	                    </div>\
-	                    <div class='center-text text-up'>恭喜，获得100积分</div>\
-	                    <div class='center-text text-down'>邮箱激活账号获得更多积分</div>\
-	                    <input type='button' class='u-button button active-button' value='Go 激 活 邮 箱'></input>\
-	                    <input type='button' class='u-button button finish-button' value='完 成，继 续 观 看'></input>\
-	                </div>";
-	    return tmpl;
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
@@ -30021,7 +30021,7 @@ this["Iva"] =
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	    var vector = __webpack_require__(54);
+	    var vector = __webpack_require__(51);
 
 	    'use strict';
 
