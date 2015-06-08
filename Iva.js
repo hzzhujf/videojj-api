@@ -50,7 +50,7 @@ this["Iva"] =
 	 * @author zhujiefeng
 	 * @email	flyingpig@venvyvideo.cn
 	 */
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4),__webpack_require__(5), __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (docCookies, ajax, ivaInit, environment, $, validator) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4),__webpack_require__(5), __webpack_require__(7), __webpack_require__(8), __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (docCookies, ajax, ivaInit, environment, $, validator, ivaAlert, cookie) {
 		function Iva (parent, options) {
 			var init = function () {
 				ajax('/video/new', 'POST', {
@@ -58,18 +58,19 @@ this["Iva"] =
 				}, function (data) {
 					if (data.status === 0) {
 	    				ivaInit(parent, data.msg._id, data.msg.source[0].link, options);
+	    			} else if (data.status === 400) {
+	    				ivaAlert($(parent), '请先登录')
 	    			}
 				})
 			}
 			window.getCookieCb = function (data) {
 				//已登录
 				if (!!data.sess) {
-					docCookies.setItem('isLogined', 'true');
-					// isLogined = true;
-					docCookies.setItem('crossDomainSess', data.sess, Infinity);
+					cookie.isLogined = true;
+					cookie.sess = data.sess;
 				}
 				if (!!data.sid) {
-					docCookies.setItem('crossDomainSid', data.sid, Infinity);
+					cookie.sid = data.sid;
 				}
 				init();
 			}
@@ -119,9 +120,16 @@ this["Iva"] =
 			keys: function () {
 				var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
 				for (var nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]); }
-					return aKeys;
+				return aKeys;
+			},
+			clear: function () {
+				var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
+				for (var nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) {
+					aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]);
+					document.cookie = aKeys[nIdx] + '=; max-age=0';
 				}
-			};
+			}
+		};
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
@@ -139,11 +147,13 @@ this["Iva"] =
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(5)
 		, __webpack_require__(4)
-		, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function ($, environment, docCookies) {
+		, __webpack_require__(1)
+		, __webpack_require__(8)
+		, __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function ($, environment, docCookies, ivaAlert, cookie) {
 		return function (url, method, data, success) {
 			var headers = {
-				sess: docCookies.getItem('crossDomainSess'),
-				sid: docCookies.getItem('crossDomainSid')
+				sess: cookie.sess,
+				sid: cookie.sid
 			};
 			return $.ajax({
 				method: method,
@@ -151,6 +161,10 @@ this["Iva"] =
 				url: environment.host+url,
 				data: data,
 				success: function (data) {
+					if (data.status === 400) {
+						ivaAlert(null, '请先登录');
+						cookie = {};
+					}
 					success(data);
 				},
 				headers: headers
@@ -163,28 +177,29 @@ this["Iva"] =
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__
-		, __webpack_require__(7)
+		, __webpack_require__(9)
 	    , __webpack_require__(5)
-	    , __webpack_require__(16)
-	    , __webpack_require__(17)
+	    , __webpack_require__(22)
+	    , __webpack_require__(23)
 	    , __webpack_require__(1)
 	    , __webpack_require__(4)
 	    , __webpack_require__(2)
-	    , __webpack_require__(8)
-	    , __webpack_require__(9)
-	    , __webpack_require__(15)
+	    , __webpack_require__(10)
 	    , __webpack_require__(11)
-	    , __webpack_require__(12)
+	    , __webpack_require__(21)
 	    , __webpack_require__(13)
-	    , __webpack_require__(14)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require, tag, $, player, zrender, docCookies, environment, ajax, sideBar, handlebar, dgupdateTmpl, showDg, updateDg, logWindow, ivaAlert) {
+	    , __webpack_require__(14)
+	    , __webpack_require__(15)
+	    , __webpack_require__(8)
+	    , __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require, tag, $, player, zrender, docCookies, environment, ajax, sideBar, handlebar, dgupdateTmpl, showDg, updateDg, logWindow, ivaAlert, cookie) {
 		return function (parent, videoId, videoUrl, options) {
-			var isLogined = (docCookies.getItem('isLogined')=='true');
+			console.log(cookie);
+			var isLogined = cookie.isLogined;
 			var dotList = [];//tag信息列表
 	    	var settInvervalId;
 	    	//生成一个播放器实例
-			var playerInstance = new player('playerCnt', videoUrl, null, {
+			var playerInstance = new player('playerCnt', videoUrl, 0, {
 				play_callback: function () {
-					console.log('play');
 					settInvervalId = setInterval(function () {
 						for (var i=0; i<dotList.length; i++) {
 							var currentTime = playerInstance.get_time()*1000;
@@ -243,8 +258,8 @@ this["Iva"] =
 		    				if (data.status == 0) {
 		    					var showFav = false;
 				    			//已经登录
-								if (isLogined || docCookies.getItem('isLogined')=='true') {
-									if (docCookies.getItem('userId') != data.msg.user['_id']) {
+								if (isLogined) {
+									if (cookie.userId != data.msg.user['_id']) {
 										showFav = true;
 									}
 								}
@@ -258,8 +273,8 @@ this["Iva"] =
 		    						dgId: dgId,
 		    						sideBar: sideBarInstance
 		    					});
-		    				} else {
-		    					alert(data.msg);
+		    				} else if (data.status != 400) {
+		    					ivaAlert(ivaWrap, data.msg);
 		    				}
 			    		})
 			    		$('.tip').remove();
@@ -298,8 +313,8 @@ this["Iva"] =
 					}, function (data) {
 						if (data.status == 0) {
 							searchData.img = data.msg.data;
-						} else {
-							alert(data.msg);
+						} else if (data.status != 400) {
+							ivaAlert(data.msg);
 						}
 					}),
 					ajax('/spider/baikeText', 'GET', {
@@ -307,8 +322,8 @@ this["Iva"] =
 					}, function (data) {
 						if (data.status == 0) {
 							searchData.text = data.msg;
-						} else {
-							alert(data.msg);
+						} else if (data.status != 400) {
+							ivaAlert(data.msg);
 						}
 					})
 				).then(function () {
@@ -335,7 +350,7 @@ this["Iva"] =
 			// }
 			//获取tag
 			ajax('/tag2', 'GET', {
-				v: '55026fa406b62b8f451ce24d'
+				v: videoId
 			}, function (data) {
 				if (status == 0) {
 					dotList = data.msg.map(function (x) {
@@ -346,8 +361,8 @@ this["Iva"] =
 					}).sort(function (a, b) {
 						return (a.time - b.time);
 					});
-				} else {
-					alert(data.msg);
+				} else if (data != 400) {
+					ivaAlert(data.msg);
 				}
 			}); 
 			//清屏
@@ -370,8 +385,8 @@ this["Iva"] =
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * 定义开发环境
 	 */
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(10)], __WEBPACK_AMD_DEFINE_RESULT__ = function (config) {
-		var env = 'online';//"online" or "dev"
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(12)], __WEBPACK_AMD_DEFINE_RESULT__ = function (config) {
+		var env = 'dev';//"online" or "dev"
 		return config[env];
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
@@ -9595,6 +9610,14 @@ this["Iva"] =
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		return {};
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/*!
 	 * Copyright (c) 2015 Chris O'Hara <cohara87@gmail.com>
 	 *
@@ -10334,7 +10357,73 @@ this["Iva"] =
 
 
 /***/ },
-/* 7 */
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(16),__webpack_require__(17),__webpack_require__(18),__webpack_require__(19),__webpack_require__(20),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (push_queue,pop_queue,queue,queue_empty,is_english_symbol,$) {
+		return iva_alert = function (container,content) {
+			if (!container) {
+				container = $('.player_for_user .ivawrap');
+			}
+			if(!$('.u-iva-alert').length){
+				container.append("<div class='u-iva-alert'></div>");
+			}
+			var $container = $('.u-iva-alert');
+			var push_timeout;
+			var alert_info = function() {
+				if (queue_empty() == true){
+					queue.start_flag = false
+					clearTimeout(push_timeout);
+					return;
+				}else{
+					$container.html(queue.queue[0]);
+					// console.log(queue.queue[0].length);
+					var title_length = 0;
+					for(k in queue.queue[0]){
+						if (is_english_symbol(queue.queue[0][k]))
+							title_length += 0.5;
+						else
+							title_length += 1;
+					}
+					if(title_length <= 10){
+						$container.css({
+							width: '150px'
+						});
+					}else{
+						$container.css({
+							width: 14 * title_length + 10 + 'px'
+						});
+					}
+					setTimeout(function(){
+						$container.css({
+							top: '10px'
+						});
+					},50);
+					setTimeout(function(){
+							$container.css({
+								top: '-50px'
+							});
+					},2500);
+					push_timeout = setTimeout(function() {
+						pop_queue()
+						alert_info()
+					},3000);
+				}
+			}
+
+			push_queue(content);
+			if (queue.start_flag != false){
+				return;
+			}else{
+				queue.start_flag = true;
+				alert_info();
+			}
+		}
+		
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -10348,10 +10437,10 @@ this["Iva"] =
 	 * @return {[Void}
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(5)
-	    , __webpack_require__(17)
-	    , __webpack_require__(18)
-	    , __webpack_require__(19)
-	    , __webpack_require__(20)], __WEBPACK_AMD_DEFINE_RESULT__ = function ($, zrender, circle, line, animation) {
+	    , __webpack_require__(23)
+	    , __webpack_require__(24)
+	    , __webpack_require__(25)
+	    , __webpack_require__(26)], __WEBPACK_AMD_DEFINE_RESULT__ = function ($, zrender, circle, line, animation) {
 	    	function Tag (parent, zr, options) {
 	    		this.parent = parent;
 	    		this.zr = zr;
@@ -10501,20 +10590,22 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2)
-		, __webpack_require__(9)
+		, __webpack_require__(11)
 		, __webpack_require__(5)
-		, __webpack_require__(21)
-	    , __webpack_require__(22)
-	    , __webpack_require__(23)
-	    , __webpack_require__(24)
-	    , __webpack_require__(11)
-	    , __webpack_require__(1)
+		, __webpack_require__(29)
+	    , __webpack_require__(30)
+	    , __webpack_require__(31)
+	    , __webpack_require__(32)
 	    , __webpack_require__(13)
-	    , __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (ajax, handlebar, $, sideBarBootstrapTmpl, headTmpl, bodyTmpl, dgListTmpl, showDg, docCookies, logWindow, environment) {
+	    , __webpack_require__(1)
+	    , __webpack_require__(15)
+	    , __webpack_require__(4)
+	    , __webpack_require__(8)
+	    , __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (ajax, handlebar, $, sideBarBootstrapTmpl, headTmpl, bodyTmpl, dgListTmpl, showDg, docCookies, logWindow, environment, ivaAlert, cookie) {
 		function sideBar (parent, callback, options) {
 			this.parent = parent;
 			this.callback = callback;
@@ -10573,12 +10664,14 @@ this["Iva"] =
 				    		this.callback(keyword, this.dgData);
 				    	}
 				    }.bind(this))
+				} else if (data.status != 400) {
+					ivaAlert(null, '请先登录');
 				}
 			}.bind(this))
 		}
 		sideBar.prototype.getDgList = function () {
 			this.body.find('.m-body').remove();
-			if (docCookies.getItem('isLogined') == 'true') {
+			if (cookie.isLogined) {
 				var pn = 0;
 		    	ajax('/dg2/search', 'GET', {
 		    		pn: pn,
@@ -10591,7 +10684,7 @@ this["Iva"] =
 		    				if (x.desc.length > 30) {
 		    					x.desc = x.desc.substr(0, 30)+'...';
 		    				}
-		    				x.isFav = docCookies.getItem('userId') !== x.user['_id'];
+		    				x.isFav = cookie.userId !== x.user['_id'];
 		    				return x;
 		    			});
 		    			var body = $(handlebar.compile(bodyTmpl)({dgList: dgList, isLogined: true}));
@@ -10603,7 +10696,7 @@ this["Iva"] =
 			    			var index = $(e.delegateTarget).find('li').index($(e.currentTarget));
 			    			var dg = e.currentTarget.dataset.id;
 			    			this.hide();
-			    			var showFav = docCookies.getItem('userId')!==this.dgList[index].user['_id'];
+			    			var showFav = cookie.userId!==this.dgList[index].user['_id'];
 			    			new showDg(this.parent, this.dgList[index], {
 								onClose: this.options.onClose,
 								isQuote: true,
@@ -10628,17 +10721,17 @@ this["Iva"] =
 			    						if (x.desc.length > 30) {
 					    					x.desc = x.desc.substr(0, 30)+'...';
 					    				}
-					    				x.isFav = docCookies.getItem('userId') !== x.user['_id'];
+					    				x.isFav = cookie.userId !== x.user['_id'];
 					    				return x;
 			    					})
 			    					var list = $(handlebar.compile(dgListTmpl)({dgList: dgList}));
 				    				body.find('.list ol').append(list);
-				    				this.body.find('.m-body').animate({scrollTop: this.body.find('.m-body .list').height()}, 200);
+				    				this.body.find('.m-body').animate({scrollTop: this.body.find('.m-body .list').height()}, 500);
 				    				if (data.msg.length<4 || this.dgList.length==data.total) {
 					    				body.find('.more').hide();
 					    			}
-			    				} else {
-			    					alert(data.msg);
+			    				} else if (data.status != 400) {
+			    					ivaAlert(null, data.msg);
 			    				}
 			    			}.bind(this))
 			    		}.bind(this))
@@ -10646,7 +10739,7 @@ this["Iva"] =
 		    			var body = $(handlebar.compile(bodyTmpl)({dgList: []}));
 			    		this.body.append(body);
 		    		} else {
-		    			alert(data.msg);
+		    			ivaAlert(null, data.msg);
 		    		}
 		    	}.bind(this))
 			} else {
@@ -10654,17 +10747,17 @@ this["Iva"] =
 				body.find('.note a').click(function () {
 					this.hide()
 					logWindow($(this.parent), function (data) {
-						docCookies.setItem('userId', data['_id']);
-						docCookies.setItem('isLogined', true);
-						docCookies.setItem('crossDomainSess', data.sess);
-						docCookies.setItem('crossDomainSid', data.sid);
+						cookie.userId = data['_id'];
+						cookie.isLogined = true;
+						cookie.sess = data.sess;
+						cookie.sid = data.sid;
 						this.options.onClose();
 						this.getUserInfo();
 						this.getDgList();
-						this.show();
+						// this.show();
 						$('body').append('<script src="'+environment.host+'/setCookie.js?sess='+data.sess+'"></script>');
 					}.bind(this), function () {
-						this.onClose();
+						this.options.onClose();
 					}.bind(this))
 				}.bind(this))
 	    		this.body.append(body);
@@ -10674,7 +10767,7 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -14810,7 +14903,7 @@ this["Iva"] =
 	;
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -14830,15 +14923,17 @@ this["Iva"] =
 	})
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(9)
-		, __webpack_require__(25)
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11)
+		, __webpack_require__(27)
 		, __webpack_require__(2)
 		, __webpack_require__(1)
-		, __webpack_require__(13)
-		, __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar, dgshowTmpl, ajax, docCookies, logWindow, $) {
+		, __webpack_require__(15)
+		, __webpack_require__(5)
+		, __webpack_require__(8)
+		, __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar, dgshowTmpl, ajax, docCookies, logWindow, $, ivaAlert, cookie) {
 			function Dg (parent, data, options) {
 				this.parent = parent;
 				data.isQuote = options.isQuote?options.isQuote:false;
@@ -14863,7 +14958,7 @@ this["Iva"] =
 					var src = target.src;
 					this.body.find('.pics img').attr('src', src);
 				}.bind(this))
-				var isLogined = docCookies.getItem('isLogined');
+				var isLogined = cookie.isLogined;
 				if (isLogined=='true') {
 					if (!!this.body.find('.linkWrap .favour').length) {
 						ajax('/dgFav/isFav/'+this.dgId, 'GET', {}, function (data) {
@@ -14906,6 +15001,9 @@ this["Iva"] =
 						if (data.status == 0) {
 							this.close();
 							this.onClose();
+							ivaAlert($(this.parent), '标签添加成功');
+						} else if (data.status != 400) {
+							ivaAlert($(this.parent), data.msg);
 						}
 					}.bind(this))
 				}
@@ -14914,7 +15012,7 @@ this["Iva"] =
 				var formData = {};
 				formData.title = this.body.find('.slogan input').val();//tag标题
 				if (!formData.title) {
-					iva_alert($(this.parent), '标签显示文字不能为空');
+					ivaAlert($(this.parent), '标签显示文字不能为空');
 					return false;
 				}
 				formData.dg = this.dgData.dg;
@@ -14929,17 +15027,19 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(9)
-		, __webpack_require__(15)
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11)
+		, __webpack_require__(21)
 		, __webpack_require__(2)
-		, __webpack_require__(14)
+		, __webpack_require__(8)
 		, __webpack_require__(1)
-		, __webpack_require__(13)
+		, __webpack_require__(15)
 		, __webpack_require__(4)
-		, __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar, dgupdateTmpl, ajax, ivaAlert, docCookies, logWindow, environment, $) {
+		, __webpack_require__(5)
+		, __webpack_require__(8)
+		, __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar, dgupdateTmpl, ajax, ivaAlert, docCookies, logWindow, environment, $, ivaAlert, cookie) {
 			function Dgupdate (parent, data, options) {
 				this.parent = parent;
 				this.body = $(handlebar.compile(dgupdateTmpl)(data));
@@ -15022,13 +15122,16 @@ this["Iva"] =
 				var data = this.getFormData();
 				if (!data)
 					return
-				if (docCookies.getItem('isLogined') == 'true') {
+				if (cookie.isLogined) {
 					if (data) {
 						ajax('/tag2', 'POST', data, function (data) {
 							if (data.status == 0) {
 								this.close();
 								this.onClose();
 								this.options.sideBar.getDgList();
+								ivaAlert($(this.parent), '标签添加成功');
+							} else if (data.status != 400) {
+								ivaAlert($(this.parent), data.msg);
 							}
 						}.bind(this))
 					}
@@ -15052,7 +15155,7 @@ this["Iva"] =
 				var formData = {};
 				formData.title = this.body.find('.slogan input').val();//tag标题
 				if (!formData.title) {
-					iva_alert($(this.parent), '标签显示文字不能为空');
+					ivaAlert($(this.parent), '标签显示文字不能为空');
 					return false;
 				}
 				formData.cat = 3;//创建
@@ -15067,7 +15170,7 @@ this["Iva"] =
 					}
 				})
 				if (!formData.pic.length) {
-					iva_alert($(this.parent), '至少添加一张图片');
+					ivaAlert($(this.parent), '至少添加一张图片');
 					return false;
 				}
 				formData.link = this.body.find('.linkWrap .editWrap').get().map(function (x, index) {
@@ -15077,12 +15180,12 @@ this["Iva"] =
 					}
 				})
 				if (!formData.link[0].url && !formData.link[1].url) {
-					iva_alert($(this.parent), '至少添加一个链接');
+					ivaAlert($(this.parent), '至少添加一个链接');
 					return false;
 				}
 				formData.desc = this.body.find('.detail textarea').val();
 				if (!formData.desc) {
-					iva_alert($(this.parent), '描述不能为空');
+					ivaAlert($(this.parent), '描述不能为空');
 					return false;
 				}
 				return formData;
@@ -15091,80 +15194,93 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(9),__webpack_require__(2),__webpack_require__(26)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar,ajax,login) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11),__webpack_require__(2),__webpack_require__(28)], __WEBPACK_AMD_DEFINE_RESULT__ = function (handlebar,ajax,login) {
 	    return function (container,callback,close_callback) {
 	        login(container,callback,close_callback);
 	    }
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(27),__webpack_require__(28),__webpack_require__(29),__webpack_require__(30),__webpack_require__(31),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (push_queue,pop_queue,queue,queue_empty,is_english_symbol,$) {
-		return iva_alert = function (container,content) {
-			if(!$('.u-iva-alert').length){
-				container.append("<div class='u-iva-alert'></div>");
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(18)], __WEBPACK_AMD_DEFINE_RESULT__ = function (queue) {
+		return function (content) {
+			var queue_length = 0
+			for (qs in queue.queue){
+				if(queue.queue[qs] == content)
+					return
+				queue_length++
 			}
-			var $container = $('.u-iva-alert');
-			var push_timeout;
-			var alert_info = function() {
-				if (queue_empty() == true){
-					queue.start_flag = false
-					clearTimeout(push_timeout);
-					return;
-				}else{
-					$container.html(queue.queue[0]);
-					// console.log(queue.queue[0].length);
-					var title_length = 0;
-					for(k in queue.queue[0]){
-						if (is_english_symbol(queue.queue[0][k]))
-							title_length += 0.5;
-						else
-							title_length += 1;
-					}
-					if(title_length <= 10){
-						$container.css({
-							width: '150px'
-						});
-					}else{
-						$container.css({
-							width: 14 * title_length + 10 + 'px'
-						});
-					}
-					setTimeout(function(){
-						$container.css({
-							top: '10px'
-						});
-					},50);
-					setTimeout(function(){
-							$container.css({
-								top: '-50px'
-							});
-					},2500);
-					push_timeout = setTimeout(function() {
-						pop_queue()
-						alert_info()
-					},3000);
-				}
-			}
-
-			push_queue(content);
-			if (queue.start_flag != false){
-				return;
+			if(content != null){
+				queue.queue[queue_length] = content
 			}else{
-				queue.start_flag = true;
-				alert_info();
+				return
 			}
+			console.log(queue.queue);
 		}
-		
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 15 */
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(18)], __WEBPACK_AMD_DEFINE_RESULT__ = function (queue) {
+		return function () {
+			var queue_length = 0
+			for (qs in queue.queue){
+				queue_length++
+			}
+			for(var _i = 0; _i < queue_length - 1; _i++)
+				queue.queue[_i] = queue.queue[_i + 1];
+			delete(queue.queue[queue_length - 1])
+			console.log(queue.queue);
+		}
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	!(module.exports = {
+		start_flag: false,
+		queue: {}
+	});
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(18)], __WEBPACK_AMD_DEFINE_RESULT__ = function (queue) {
+		return function () {
+			var queue_length = 0
+			for (qs in queue.queue){
+				queue_length++
+			}
+			if (queue_length == 0){
+				return true
+			}else{
+				return false
+			}
+		}
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    return function (obj) {
+	        var Englishorsymbol=/^[A-Za-z]|[\x00-\uFF]+$/;
+	        return Englishorsymbol.test(obj);
+	    }
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ },
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -15186,12 +15302,12 @@ this["Iva"] =
 								<div class="summary f-cb">\
 									<div class="picWrap">\
 										<div class="pics">\
-											<img src="{{img.[0].thumbURL}}">\
+											<img src="{{img.[0].objURL}}">\
 										</div>\
 										<div class="choose f-cb">\
 											{{#each img}}\
 											<div class="chooWrap">\
-												<img src="{{{thumbURL}}}">\
+												<img src="{{{objURL}}}">\
 											</div>\
 											{{/each}}\
 										</div>\
@@ -15231,7 +15347,7 @@ this["Iva"] =
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 16 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() { return /******/ (function(modules) { // webpackBootstrap
@@ -15283,13 +15399,14 @@ this["Iva"] =
 		var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 		  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4), __webpack_require__(17), __webpack_require__(11), __webpack_require__(12), __webpack_require__(5), __webpack_require__(1), __webpack_require__(7), __webpack_require__(32), __webpack_require__(33), __webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(player, analyze_video, sync_process, value, create_dom, v_play, v_pause, create_custom_element, add_dom_event_custom, $) {
 		    return window.venvy_player = function(container, video_url, time, params) {
-		      var after_analyze, consions, pause_callback, play_callback, stamp, start_seek_callback, stop_callback, video_poster, x;
+		      var after_analyze, consions, loaded_callback, pause_callback, play_callback, stamp, start_seek_callback, stop_callback, video_poster, x;
 		      if (params != null) {
 		        play_callback = params.play_callback;
 		        pause_callback = params.pause_callback;
 		        stop_callback = params.stop_callback;
 		        start_seek_callback = params.start_seek_callback;
 		        video_poster = params.video_poster;
+		        loaded_callback = params.loaded_callback;
 		      }
 		      stamp = new Date().getTime();
 		      container = player(container, video_url);
@@ -15306,6 +15423,22 @@ this["Iva"] =
 		      });
 		      create_dom(container);
 		      x = void 0;
+		      x = setInterval(function() {
+		        if (container.find('.cur_player')[0] != null) {
+		          if ((container.find('.cur_player')[0].error || container.find('.back_player')[0].error) != null) {
+		            console.log(container.find('.back_player')[0].error);
+		            console.log(container.find('.back_player').attr('src'));
+		            if ((container.find('.back_player').attr('src')) !== '') {
+		              container.find('.is_buffering').css({
+		                display: 'block'
+		              });
+		              container.find('.is_buffering_text').html('线路故障，正在为您切换新线路！');
+		              console.log('error!!');
+		              return consions();
+		            }
+		          }
+		        }
+		      }, 1000);
 		      consions = function() {
 		        value["need_to_return_clarify" + stamp] = true;
 		        analyze_video(video_url, after_analyze, venvy_player.get_time());
@@ -15313,27 +15446,11 @@ this["Iva"] =
 		      };
 		      after_analyze = function(address, total_time, cur_site, time) {
 		        var cur_format;
-		        x = setInterval(function() {
-		          if (container.find('.cur_player')[0] != null) {
-		            if ((container.find('.cur_player')[0].error || container.find('.back_player')[0].error) != null) {
-		              console.log(container.find('.back_player')[0].error);
-		              console.log(container.find('.back_player').attr('src'));
-		              if ((container.find('.back_player').attr('src')) !== '') {
-		                container.find('.is_buffering').css({
-		                  display: 'block'
-		                });
-		                container.find('.is_buffering_text').html('线路故障，正在为您切换新线路！');
-		                console.log('error!!');
-		                return consions();
-		              }
-		            }
-		          }
-		        }, 1000);
 		        value["cur_address" + stamp] = address;
 		        value["total_time" + stamp] = total_time;
 		        value["cur_site" + stamp] = cur_site;
 		        cur_format = value["cur_format" + stamp];
-		        return sync_process(container, stamp, cur_format, time, play_callback, pause_callback, stop_callback, start_seek_callback, video_poster);
+		        return sync_process(container, stamp, cur_format, time, play_callback, pause_callback, stop_callback, start_seek_callback, video_poster, loaded_callback);
 		      };
 		      if ((video_url.substr(-3)) === 'mp4') {
 		        create_custom_element(container, time, video_url, stamp, play_callback, pause_callback, stop_callback, start_seek_callback, video_poster);
@@ -15918,7 +16035,7 @@ this["Iva"] =
 
 		var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 		  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(12), __webpack_require__(13), __webpack_require__(15), __webpack_require__(25), __webpack_require__(18), __webpack_require__(26), __webpack_require__(19), __webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(value, add_video_clarity, create_play_list, create_h5_element, create_video, add_dom_event, create_flash_element, $) {
-		    return function(container, stamp, cur_format, time, play_callback, pause_callback, stop_callback, start_seek_callback, video_poster) {
+		    return function(container, stamp, cur_format, time, play_callback, pause_callback, stop_callback, start_seek_callback, video_poster, loaded_callback) {
 		      var cur_address, cur_list, cur_site, cur_source_format, play_list, total_time, total_video;
 		      value["cur_play_video" + stamp] = 0;
 		      cur_address = value["cur_address" + stamp];
@@ -15940,7 +16057,7 @@ this["Iva"] =
 		        create_video(container, cur_list, 'flv', value["cur_play_video" + stamp], stamp);
 		      } else {
 		        console.log(value["cur_format" + stamp]);
-		        create_h5_element(container, cur_list, 'mp4', time, total_time, total_video, stamp, video_poster);
+		        create_h5_element(container, cur_list, 'mp4', time, total_time, total_video, stamp, video_poster, loaded_callback, play_callback);
 		        create_video(container, cur_list, cur_source_format, value["cur_play_video" + stamp], stamp);
 		      }
 		      return add_dom_event(container, cur_list, total_time, cur_source_format, stamp, play_callback, pause_callback, stop_callback, start_seek_callback);
@@ -16598,7 +16715,7 @@ this["Iva"] =
 
 		var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
 		  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(16), __webpack_require__(22), __webpack_require__(23), __webpack_require__(24), __webpack_require__(21), __webpack_require__(26), __webpack_require__(12), __webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(change_video, get_buffer, getCur_time, format_time, jumpTo, add_dom_event, value, $) {
-		    return function(container, cur_list, cur_source_format, time, total_time, total_video, stamp, video_poster) {
+		    return function(container, cur_list, cur_source_format, time, total_time, total_video, stamp, video_poster, loaded_callback, play_callback) {
 		      var $back_player, $cur_player, $former_player, $is_buffering, $is_buffering_text, $player, $player_control_bar_click, $player_control_bar_current, $player_control_bar_dot, $player_control_bar_progress_buffer, $player_control_bar_progress_played, former_time, need_to_update_flag;
 		      if (video_poster == null) {
 		        video_poster = '';
@@ -16657,7 +16774,7 @@ this["Iva"] =
 		          $is_buffering.css({
 		            display: 'block'
 		          });
-		          $is_buffering_text.html('缓冲中，请稍候');
+		          $is_buffering_text.html("您的网络状态不佳，您可以<a style='color:red;cursor:pointer'>点这里</a>切换最佳线路");
 		          return $player.one('timeupdate', function() {
 		            var dot_move_flag;
 		            console.log('play');
@@ -16720,6 +16837,10 @@ this["Iva"] =
 		      return $cur_player.one('loadeddata', function() {
 		        if (time != null) {
 		          jumpTo(container, cur_list, total_time, cur_source_format, time, stamp);
+		          play_callback();
+		        }
+		        if (loaded_callback != null) {
+		          loaded_callback();
 		        }
 		        return console.log('成功加载视频流！');
 		      });
@@ -17540,7 +17661,7 @@ this["Iva"] =
 	/******/ ])}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));;
 
 /***/ },
-/* 17 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -17565,16 +17686,16 @@ this["Iva"] =
 	         * http://explorercanvas.googlecode.com/svn/trunk/excanvas.js
 	         */
 	        // 核心代码会生成一个全局变量 G_vmlCanvasManager，模块改造后借用于快速判断canvas支持
-	        __webpack_require__(32);
+	        __webpack_require__(33);
 
-	        var util = __webpack_require__(33);
-	        var log = __webpack_require__(34);
-	        var guid = __webpack_require__(35);
+	        var util = __webpack_require__(34);
+	        var log = __webpack_require__(35);
+	        var guid = __webpack_require__(36);
 
-	        var Handler = __webpack_require__(36);
-	        var Painter = __webpack_require__(37);
-	        var Storage = __webpack_require__(38);
-	        var Animation = __webpack_require__(20);
+	        var Handler = __webpack_require__(37);
+	        var Painter = __webpack_require__(38);
+	        var Storage = __webpack_require__(39);
+	        var Animation = __webpack_require__(26);
 
 	        var _instances = {};    // ZRender实例map索引
 
@@ -17678,7 +17799,7 @@ this["Iva"] =
 	             * @type {string}
 	             */
 	            this.id = id;
-	            this.env = __webpack_require__(39);
+	            this.env = __webpack_require__(40);
 
 	            this.storage = new Storage();
 	            this.painter = new Painter(dom, this.storage);
@@ -18144,7 +18265,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 18 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -18195,7 +18316,7 @@ this["Iva"] =
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 
-	        var Base = __webpack_require__(40);
+	        var Base = __webpack_require__(41);
 
 	        /**
 	         * @alias module:zrender/shape/Circle
@@ -18259,13 +18380,13 @@ this["Iva"] =
 	            }
 	        };
 
-	        __webpack_require__(33).inherits(Circle, Base);
+	        __webpack_require__(34).inherits(Circle, Base);
 	        return Circle;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 19 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -18310,8 +18431,8 @@ this["Iva"] =
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(40);
-	        var dashedLineTo = __webpack_require__(41);
+	        var Base = __webpack_require__(41);
+	        var dashedLineTo = __webpack_require__(45);
 	        
 	        /**
 	         * @alias module:zrender/shape/Line
@@ -18388,13 +18509,13 @@ this["Iva"] =
 	            }
 	        };
 
-	        __webpack_require__(33).inherits(Line, Base);
+	        __webpack_require__(34).inherits(Line, Base);
 	        return Line;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 20 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -18409,7 +18530,7 @@ this["Iva"] =
 
 	        var Clip = __webpack_require__(42);
 	        var color = __webpack_require__(43);
-	        var util = __webpack_require__(33);
+	        var util = __webpack_require__(34);
 	        var Dispatcher = __webpack_require__(44).Dispatcher;
 
 	        var requestAnimationFrame = window.requestAnimationFrame
@@ -19006,93 +19127,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-		var tmpl = '<div class="m-sidebar" style="right:-240px;">\
-					</div>';
-		return tmpl;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (environment) {
-		var tmpl = '<div class="m-head">\
-						<div class="content f-cb">\
-							<div class="avatar">\
-								<a href="'+environment.host+'/public/venvy/app/user.html#/index" target="_blank">\
-									<img src="{{{avatar}}}">\
-								</a>\
-							</div>\
-							<div class="info">\
-								<h2 class="name">{{{name}}}</h2>\
-								<p class="slogan">{{{desc}}}</p>\
-							</div>\
-						</div>\
-						<div class="search">\
-							<input type="text" placeholder="搜索你想要标注的物体"></input>\
-							<p class="hint"><span class="numner">0</span>/<span class="total">12</span></p>\
-						</div>\
-					</div>';
-		return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(24)], __WEBPACK_AMD_DEFINE_RESULT__ = function (dgList) {
-		var tmpl = '<div class="m-body">\
-						<div class="list">\
-							{{#if isLogined}}\
-							<ol>' + dgList + '</ol>\
-							<div class="more">\
-								{{#if dgList.[length]}}\
-								<a href="javascript:void(0);">点击加载更多...</a>\
-								{{else}}\
-								没有收藏的云窗\
-								{{/if}}\
-							</div>\
-							{{else}}\
-							<div class="note">请先<a>登录</a>，查看云窗信息</div>\
-							{{/if}}\
-						</div>\
-					</div>';
-		return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-		var tmpl = '{{#each dgList}}\
-						<li data-id="{{{_id}}}">\
-							<div class="picture">\
-								<img src="{{pic.[0].[url]}}">\
-							</div>\
-							<div class="content">\
-								<div class="head">\
-									<h2>{{{title}}}</h2>\
-									{{#if isFav}}\
-									<span class="ivaiconfont">&#xe6b7;</span>\
-									{{/if}}\
-								</div>\
-								<div class="detail">\
-									<p>{{{desc}}}</p>\
-								</div>\
-							</div>\
-							<div class="mask">点击引用</div>\
-						</li>\
-					{{/each}}';
-		return tmpl;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (environment) {
@@ -19166,172 +19201,183 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(9),__webpack_require__(2),__webpack_require__(45),__webpack_require__(46),__webpack_require__(14),__webpack_require__(47),__webpack_require__(48),__webpack_require__(4),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,regester,iva_alert,validator,flash,environment,$) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(47),__webpack_require__(8),__webpack_require__(48),__webpack_require__(49),__webpack_require__(4),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,regester,iva_alert,validator,flash,environment,$) {
 	    return function (container,callback,close_callback) {
-	        if (!$('.m-login-and-regester').length){
-	            var $login = $(handlebar.compile(logWindow_tmp('login'))());
-	            container.before($login);
-	            $login.hide();
-	            $login.fadeIn(300);
-	            $exit = $login.find('.exit')
-	            $input_box = $login.find('.input-box')
-	            $account_input = $login.find('.account-input');
-	            $passwd_input = $login.find('.passwd-input');
-	            $login_button = $login.find('.login-button');
-	            $regester = $login.find('.regester');
-	            $forget = $login.find('.forget');
-	            $exit.click(function(){
-	                $('.m-login-and-regester').fadeOut(300,function(){
-	                    $(this).remove();
-	                    if (close_callback)
-	                        close_callback();
-	                });
-	            });
-	            $input_box.focus(function(){
-	                $(this).parent().find('.input-icon').addClass('input-icon-focus')
-	            });
-	            $input_box.blur(function(){
-	                $(this).parent().find('.input-icon').removeClass('input-icon-focus')
-	            });
-	            $login_button.click(function(){
-	                pack = {
-	                    foo: $account_input.val(),
-	                    pwd: $passwd_input.val()
-	                }
-	                if (pack.foo == ''){
-	                    iva_alert(container,'用户名或密码不能为空');
-	                    flash('.account-input',8,10,100);
-	                }else if (!(validator.isEmail(pack.foo) || validator.isMobilePhone(pack.foo,'zh-CN'))){
-	                    iva_alert(container,'用户名是您的邮箱或手机号');
-	                    flash('.account-input',8,10,100);
-	                }
-	                if (pack.pwd == ''){
-	                    iva_alert(container,'用户名或密码不能为空');
-	                    flash('.passwd-input',8,10,100);
-	                }else if(pack.pwd.length < 6 || pack.pwd.length > 30){
-	                    iva_alert(container,'密码长度应在6-30位之间');
-	                    flash('.passwd-input',8,10,100);
-	                }
-	                if (pack.foo != '' && (validator.isEmail(pack.foo) || validator.isMobilePhone(pack.foo,'zh-CN')) && pack.pwd != '' && (pack.pwd.length >= 6 || pack.pwd.length <= 30)){
-	                    ajax('/sign', 'POST', pack
-	                    , function (data) {
-	                        console.log(data)
-	                        if(data.status == 0){
-	                            callback(data.msg);
-	                            $('.m-login-and-regester').fadeOut(300,function(){
-	                                $('.m-login-and-regester').remove();
-	                            });
-	                        }else if (data.status == 1) {
-	                            iva_alert(container,'密码错误');
-	                            flash('.passwd-input',8,10,100);
-	                        }else if (data.status == 2) {
-	                            iva_alert(container,'用户名不存在');
-	                            flash('.account-input',8,10,100);
-	                        }
-	                    })
-	                }
-	            });
-
-	            $regester.click(function(){
-	                $login.fadeOut(300,function(){
-	                    $login.remove();
-	                    __webpack_require__(46)(container);
-	                });
-	            });
-	            $forget.click(function(){
-	                window.open(environment.host+'/user/forgetPwd');
-	            });
-	        }else{
+	        var $login = $(handlebar.compile(logWindow_tmp('login'))());
+	        container.before($login);
+	        $login.hide();
+	        $login.fadeIn(300);
+	        $exit = $login.find('.exit')
+	        $input_box = $login.find('.input-box')
+	        $account_input = $login.find('.account-input');
+	        $passwd_input = $login.find('.passwd-input');
+	        $login_button = $login.find('.login-button');
+	        $regester = $login.find('.regester');
+	        $forget = $login.find('.forget');
+	        $exit.click(function(){
 	            $('.m-login-and-regester').fadeOut(300,function(){
 	                $(this).remove();
 	                if (close_callback)
 	                    close_callback();
 	            });
-	        }
+	        });
+	        $input_box.focus(function(){
+	            $(this).parent().find('.input-icon').addClass('input-icon-focus')
+	        });
+	        $input_box.blur(function(){
+	            $(this).parent().find('.input-icon').removeClass('input-icon-focus')
+	        });
+	        $login_button.click(function(){
+	            pack = {
+	                foo: $account_input.val(),
+	                pwd: $passwd_input.val()
+	            }
+	            if (pack.foo == ''){
+	                iva_alert(container,'用户名或密码不能为空');
+	                flash('.account-input',8,10,100);
+	            }else if (!(validator.isEmail(pack.foo) || validator.isMobilePhone(pack.foo,'zh-CN'))){
+	                iva_alert(container,'用户名是您的邮箱或手机号');
+	                flash('.account-input',8,10,100);
+	            }
+	            if (pack.pwd == ''){
+	                iva_alert(container,'用户名或密码不能为空');
+	                flash('.passwd-input',8,10,100);
+	            }else if(pack.pwd.length < 6 || pack.pwd.length > 30){
+	                iva_alert(container,'密码长度应在6-30位之间');
+	                flash('.passwd-input',8,10,100);
+	            }
+	            if (pack.foo != '' && (validator.isEmail(pack.foo) || validator.isMobilePhone(pack.foo,'zh-CN')) && pack.pwd != '' && (pack.pwd.length >= 6 || pack.pwd.length <= 30)){
+	                ajax('/sign', 'POST', pack
+	                , function (data) {
+	                    console.log(data)
+	                    if(data.status == 0){
+	                        callback(data.msg);
+	                        $('.m-login-and-regester').fadeOut(300,function(){
+	                            $('.m-login-and-regester').remove();
+	                        });
+	                    }else if (data.status == 1) {
+	                        iva_alert(container,'密码错误');
+	                        flash('.passwd-input',8,10,100);
+	                    }else if (data.status == 2) {
+	                        iva_alert(container,'用户名不存在');
+	                        flash('.account-input',8,10,100);
+	                    }
+	                })
+	            }
+	        });
+	        $regester.click(function(){
+	            $login.fadeOut(300,function(){
+	                $login.remove();
+	                __webpack_require__(47)(container,callback,close_callback);
+	            });
+	        });
+	        $forget.click(function(){
+	            window.open(environment.host+'/user/forgetPwd');
+	        });
+	        $forget.click(function(){
+	            window.open('http://wantv.me/user/forgetPwd');
+	        });
+	        $('.close').click(function(){
+	            $('.m-login-and-regester').fadeOut(300,function(){
+	                $(this).remove();
+	                if (close_callback)
+	                    close_callback();
+	            });
+	        });
 	    }
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(29)], __WEBPACK_AMD_DEFINE_RESULT__ = function (queue) {
-		return function (content) {
-			var queue_length = 0
-			for (qs in queue.queue){
-				if(queue.queue[qs] == content)
-					return
-				queue_length++
-			}
-			if(content != null){
-				queue.queue[queue_length] = content
-			}else{
-				return
-			}
-			console.log(queue.queue);
-		}
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(29)], __WEBPACK_AMD_DEFINE_RESULT__ = function (queue) {
-		return function () {
-			var queue_length = 0
-			for (qs in queue.queue){
-				queue_length++
-			}
-			for(var _i = 0; _i < queue_length - 1; _i++)
-				queue.queue[_i] = queue.queue[_i + 1];
-			delete(queue.queue[queue_length - 1])
-			console.log(queue.queue);
-		}
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	!(module.exports = {
-		start_flag: false,
-		queue: {}
-	});
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		var tmpl = '<div class="m-sidebar" style="right:-240px;">\
+					</div>';
+		return tmpl;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(29)], __WEBPACK_AMD_DEFINE_RESULT__ = function (queue) {
-		return function () {
-			var queue_length = 0
-			for (qs in queue.queue){
-				queue_length++
-			}
-			if (queue_length == 0){
-				return true
-			}else{
-				return false
-			}
-		}
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (environment) {
+		var tmpl = '<div class="m-head">\
+						<div class="content f-cb">\
+							<div class="avatar">\
+								<a href="'+environment.host+'/public/venvy/app/user.html#/index" target="_blank">\
+									<img src="{{{avatar}}}">\
+								</a>\
+							</div>\
+							<div class="info">\
+								<h2 class="name">{{{name}}}</h2>\
+								<p class="slogan">{{{desc}}}</p>\
+							</div>\
+						</div>\
+						<div class="search">\
+							<input type="text" placeholder="搜索你想要标注的物体"></input>\
+							<p class="hint"><span class="numner">0</span>/<span class="total">12</span></p>\
+						</div>\
+					</div>';
+		return tmpl;
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    return function (obj) {
-	        var Englishorsymbol=/^[A-Za-z]|[\x00-\uFF]+$/;
-	        return Englishorsymbol.test(obj);
-	    }
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(32)], __WEBPACK_AMD_DEFINE_RESULT__ = function (dgList) {
+		var tmpl = '<div class="m-body">\
+						<div class="list">\
+							{{#if isLogined}}\
+							<ol>' + dgList + '</ol>\
+							<div class="more">\
+								{{#if dgList.[length]}}\
+								<a href="javascript:void(0);">点击加载更多...</a>\
+								{{else}}\
+								没有收藏的云窗\
+								{{/if}}\
+							</div>\
+							{{else}}\
+							<div class="note">请先<a>登录</a>，查看云窗信息</div>\
+							{{/if}}\
+						</div>\
+					</div>';
+		return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
 /* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		var tmpl = '{{#each dgList}}\
+						<li data-id="{{{_id}}}">\
+							<div class="picture">\
+								<img src="{{pic.[0].[url]}}">\
+							</div>\
+							<div class="content">\
+								<div class="head">\
+									<h2>{{{title}}}</h2>\
+									{{#if isFav}}\
+									<span class="ivaiconfont">&#xe6b7;</span>\
+									{{/if}}\
+								</div>\
+								<div class="detail">\
+									<p>{{{desc}}}</p>\
+								</div>\
+							</div>\
+							<div class="mask">点击引用</div>\
+						</li>\
+					{{/each}}';
+		return tmpl;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;// Copyright 2006 Google Inc.
@@ -20793,7 +20839,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -20897,7 +20943,7 @@ this["Iva"] =
 
 	        function getContext() {
 	            if (!_ctx) {
-	                __webpack_require__(32);
+	                __webpack_require__(33);
 	                /* jshint ignore:start */
 	                if (window['G_vmlCanvasManager']) {
 	                    var _div = document.createElement('div');
@@ -21037,11 +21083,11 @@ this["Iva"] =
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var config = __webpack_require__(49);
+	        var config = __webpack_require__(50);
 
 	        /**
 	         * @exports zrender/tool/log
@@ -21075,7 +21121,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -21094,7 +21140,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -21109,15 +21155,15 @@ this["Iva"] =
 
 	        'use strict';
 
-	        var config = __webpack_require__(49);
-	        var env = __webpack_require__(39);
+	        var config = __webpack_require__(50);
+	        var env = __webpack_require__(40);
 	        var eventTool = __webpack_require__(44);
-	        var util = __webpack_require__(33);
-	        var vec2 = __webpack_require__(50);
-	        var mat2d = __webpack_require__(51);
+	        var util = __webpack_require__(34);
+	        var vec2 = __webpack_require__(54);
+	        var mat2d = __webpack_require__(55);
 	        var EVENT = config.EVENT;
 
-	        var Eventful = __webpack_require__(52);
+	        var Eventful = __webpack_require__(56);
 
 	        var domHandlerNames = [
 	            'resize', 'click', 'dblclick',
@@ -22055,7 +22101,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -22068,14 +22114,14 @@ this["Iva"] =
 	 !(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 
-	        var config = __webpack_require__(49);
-	        var util = __webpack_require__(33);
+	        var config = __webpack_require__(50);
+	        var util = __webpack_require__(34);
 	        // var vec2 = require('./tool/vector');
-	        var log = __webpack_require__(34);
+	        var log = __webpack_require__(35);
 	        // var matrix = require('./tool/matrix');
-	        var BaseLoadingEffect = __webpack_require__(53);
+	        var BaseLoadingEffect = __webpack_require__(51);
 
-	        var Layer = __webpack_require__(54);
+	        var Layer = __webpack_require__(52);
 
 	        // 返回false的方法，用于避免页面被选中
 	        function returnFalse() {
@@ -22822,7 +22868,7 @@ this["Iva"] =
 	                shape.brush(ctx, false);
 	            }
 
-	            var ImageShape = __webpack_require__(55);
+	            var ImageShape = __webpack_require__(53);
 	            var imgShape = new ImageShape({
 	                id : id,
 	                style : {
@@ -22866,7 +22912,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -22880,9 +22926,9 @@ this["Iva"] =
 
 	        'use strict';
 
-	        var util = __webpack_require__(33);
+	        var util = __webpack_require__(34);
 
-	        var Group = __webpack_require__(56);
+	        var Group = __webpack_require__(57);
 
 	        var defaultIterateOption = {
 	            hover: false,
@@ -23287,7 +23333,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -23372,7 +23418,7 @@ this["Iva"] =
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -23415,13 +23461,13 @@ this["Iva"] =
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	        var vmlCanvasManager = window['G_vmlCanvasManager'];
 
-	        var matrix = __webpack_require__(51);
-	        var guid = __webpack_require__(35);
-	        var util = __webpack_require__(33);
-	        var log = __webpack_require__(34);
+	        var matrix = __webpack_require__(55);
+	        var guid = __webpack_require__(36);
+	        var util = __webpack_require__(34);
+	        var log = __webpack_require__(35);
 
 	        var Transformable = __webpack_require__(58);
-	        var Eventful = __webpack_require__(52);
+	        var Eventful = __webpack_require__(56);
 
 	        function _fillText(ctx, text, x, y, textFont, textAlign, textBaseline) {
 	            if (textFont) {
@@ -24050,60 +24096,6 @@ this["Iva"] =
 
 
 /***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * 虚线lineTo 
-	 *
-	 * author:  Kener (@Kener-林峰, kener.linfeng@gmail.com)
-	 *          errorrik (errorrik@gmail.com)
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (/* require */) {
-
-	        var dashPattern = [ 5, 5 ];
-	        /**
-	         * 虚线lineTo 
-	         */
-	        return function (ctx, x1, y1, x2, y2, dashLength) {
-	            // http://msdn.microsoft.com/en-us/library/ie/dn265063(v=vs.85).aspx
-	            if (ctx.setLineDash) {
-	                dashPattern[0] = dashPattern[1] = dashLength;
-	                ctx.setLineDash(dashPattern);
-	                ctx.moveTo(x1, y1);
-	                ctx.lineTo(x2, y2);
-	                return;
-	            }
-
-	            dashLength = typeof dashLength != 'number'
-	                            ? 5 
-	                            : dashLength;
-
-	            var dx = x2 - x1;
-	            var dy = y2 - y1;
-	            var numDashes = Math.floor(
-	                Math.sqrt(dx * dx + dy * dy) / dashLength
-	            );
-	            dx = dx / numDashes;
-	            dy = dy / numDashes;
-	            var flag = true;
-	            for (var i = 0; i < numDashes; ++i) {
-	                if (flag) {
-	                    ctx.moveTo(x1, y1);
-	                }
-	                else {
-	                    ctx.lineTo(x1, y1);
-	                }
-	                flag = !flag;
-	                x1 += dx;
-	                y1 += dy;
-	            }
-	            ctx.lineTo(x2, y2);
-	        };
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
 /* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -24121,7 +24113,7 @@ this["Iva"] =
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	        var Easing = __webpack_require__(57);
+	        var Easing = __webpack_require__(60);
 
 	        function Clip(options) {
 
@@ -24220,7 +24212,7 @@ this["Iva"] =
 	 * @module zrender/tool/color
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
-	    var util = __webpack_require__(33);
+	    var util = __webpack_require__(34);
 
 	    var _ctx;
 
@@ -25304,7 +25296,7 @@ this["Iva"] =
 
 	        'use strict';
 
-	        var Eventful = __webpack_require__(52);
+	        var Eventful = __webpack_require__(56);
 
 	        /**
 	        * 提取鼠标（手指）x坐标
@@ -25376,101 +25368,153 @@ this["Iva"] =
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(60),__webpack_require__(61),__webpack_require__(62)], __WEBPACK_AMD_DEFINE_RESULT__ = function (login,regester,success) {
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * 虚线lineTo 
+	 *
+	 * author:  Kener (@Kener-林峰, kener.linfeng@gmail.com)
+	 *          errorrik (errorrik@gmail.com)
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (/* require */) {
+
+	        var dashPattern = [ 5, 5 ];
+	        /**
+	         * 虚线lineTo 
+	         */
+	        return function (ctx, x1, y1, x2, y2, dashLength) {
+	            // http://msdn.microsoft.com/en-us/library/ie/dn265063(v=vs.85).aspx
+	            if (ctx.setLineDash) {
+	                dashPattern[0] = dashPattern[1] = dashLength;
+	                ctx.setLineDash(dashPattern);
+	                ctx.moveTo(x1, y1);
+	                ctx.lineTo(x2, y2);
+	                return;
+	            }
+
+	            dashLength = typeof dashLength != 'number'
+	                            ? 5 
+	                            : dashLength;
+
+	            var dx = x2 - x1;
+	            var dy = y2 - y1;
+	            var numDashes = Math.floor(
+	                Math.sqrt(dx * dx + dy * dy) / dashLength
+	            );
+	            dx = dx / numDashes;
+	            dy = dy / numDashes;
+	            var flag = true;
+	            for (var i = 0; i < numDashes; ++i) {
+	                if (flag) {
+	                    ctx.moveTo(x1, y1);
+	                }
+	                else {
+	                    ctx.lineTo(x1, y1);
+	                }
+	                flag = !flag;
+	                x1 += dx;
+	                y1 += dy;
+	            }
+	            ctx.lineTo(x2, y2);
+	        };
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(62),__webpack_require__(63),__webpack_require__(64)], __WEBPACK_AMD_DEFINE_RESULT__ = function (login,regester,success) {
 	    return function (inside) {
 	        var tmpl 
 	        if (inside == 'login'){
-	            tmpl = "<div class='m-login-and-regester'>" + login + "</div>";
+	            tmpl = "<div class='m-login-and-regester'><div class='close'></div>" + login + "</div>";
 	        }else if (inside == 'regester'){
-	            tmpl = "<div class='m-login-and-regester'>" + regester + "</div>";
+	            tmpl = "<div class='m-login-and-regester'><div class='close'></div>" + regester + "</div>";
 	        }else if (inside == 'success'){
-	            tmpl = "<div class='m-login-and-regester'>" + success + "</div>";
+	            tmpl = "<div class='m-login-and-regester'><div class='close'></div>" + success + "</div>";
 	        }
 	        return tmpl;
 	    }
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(9),__webpack_require__(2),__webpack_require__(45),__webpack_require__(26),__webpack_require__(63),__webpack_require__(14),__webpack_require__(47),__webpack_require__(48),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,login,success,iva_alert,validator,flash,$) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(28),__webpack_require__(61),__webpack_require__(8),__webpack_require__(48),__webpack_require__(49),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,login,success,iva_alert,validator,flash,$) {
 	    return function (container,callback,close_callback) {
-	        if (!$('.m-login-and-regester').length){
-	            var $regester = $(handlebar.compile(logWindow_tmp('regester'))());
-	            container.before($regester);
-	            $regester.hide();
-	            $regester.fadeIn(300);
-	            $exit = $regester.find('.exit')
-	            $input_box = $regester.find('.input-box')
-	            $account_input = $regester.find('.account-input');
-	            $name_input = $regester.find('.name-input');
-	            $passwd_input = $regester.find('.passwd-input');
-	            $regester_button = $regester.find('.regester-button');
-	            $login = $regester.find('.login')
-	            $exit.click(function(){
-	                $('.m-login-and-regester').fadeOut(300,function(){
-	                    $(this).remove();
-	                    if (close_callback)
-	                        close_callback();
-	                });
-	            });
-	            $input_box.focus(function(){
-	                $(this).parent().find('.input-icon').addClass('input-icon-focus')
-	            });
-	            $input_box.blur(function(){
-	                $(this).parent().find('.input-icon').removeClass('input-icon-focus')
-	            });
-	            $regester_button.click(function(){
-	                pack = {
-	                    mail: $account_input.val(),
-	                    pwd: $passwd_input.val()
-	                }
-	                if (pack.mail == ''){
-	                    iva_alert(container,'邮箱或密码不能为空');
-	                    flash('.account-input',8,10,100);
-	                }else if (!(validator.isEmail(pack.mail))){
-	                    iva_alert(container,'邮箱格式错误');
-	                    flash('.account-input',8,10,100);
-	                }
-	                if (pack.pwd == ''){
-	                    iva_alert(container,'邮箱或密码不能为空');
-	                    flash('.passwd-input',8,10,100);
-	                }else if(pack.pwd.length < 6 || pack.pwd.length > 30){
-	                    iva_alert(container,'密码长度应在6-30位之间');
-	                    flash('.passwd-input',8,10,100);
-	                }
-	                if (pack.mail != '' && validator.isEmail(pack.mail) && pack.pwd != '' && (pack.pwd.length >= 6 || pack.pwd.length <= 30)){
-	                    ajax('/sign/signupMail', 'POST', pack
-	                    , function (data) {
-	                        if(data.status == 0){
-	                            $regester.remove();
-	                            success(container,data.msg.avatar,data.msg.mail,data.msg._id);
-	                        }else if (data.status == 500) {
-	                            iva_alert(container,'邮箱已存在');
-	                        }
-	                    });
-	                }
-	            });
-
-	            $login.click(function(){
-	                $regester.fadeOut(300,function(){
-	                    $regester.remove();
-	                    __webpack_require__(26)(container);
-	                });
-	            });
-	        }else{
+	        var $regester = $(handlebar.compile(logWindow_tmp('regester'))());
+	        container.before($regester);
+	        $regester.hide();
+	        $regester.fadeIn(300);
+	        $exit = $regester.find('.exit')
+	        $input_box = $regester.find('.input-box')
+	        $account_input = $regester.find('.account-input');
+	        $name_input = $regester.find('.name-input');
+	        $passwd_input = $regester.find('.passwd-input');
+	        $regester_button = $regester.find('.regester-button');
+	        $login = $regester.find('.login')
+	        $exit.click(function(){
 	            $('.m-login-and-regester').fadeOut(300,function(){
 	                $(this).remove();
 	                if (close_callback)
 	                    close_callback();
 	            });
-	        }
+	        });
+	        $input_box.focus(function(){
+	            $(this).parent().find('.input-icon').addClass('input-icon-focus')
+	        });
+	        $input_box.blur(function(){
+	            $(this).parent().find('.input-icon').removeClass('input-icon-focus')
+	        });
+	        $regester_button.click(function(){
+	            pack = {
+	                mail: $account_input.val(),
+	                pwd: $passwd_input.val()
+	            }
+	            if (pack.mail == ''){
+	                iva_alert(container,'邮箱或密码不能为空');
+	                flash('.account-input',8,10,100);
+	            }else if (!(validator.isEmail(pack.mail))){
+	                iva_alert(container,'邮箱格式错误');
+	                flash('.account-input',8,10,100);
+	            }
+	            if (pack.pwd == ''){
+	                iva_alert(container,'邮箱或密码不能为空');
+	                flash('.passwd-input',8,10,100);
+	            }else if(pack.pwd.length < 6 || pack.pwd.length > 30){
+	                iva_alert(container,'密码长度应在6-30位之间');
+	                flash('.passwd-input',8,10,100);
+	            }
+	            if (pack.mail != '' && validator.isEmail(pack.mail) && pack.pwd != '' && (pack.pwd.length >= 6 || pack.pwd.length <= 30)){
+	                ajax('/sign/signupMail', 'POST', pack
+	                , function (data) {
+	                    if(data.status == 0){
+	                        $regester.remove();
+	                        success(container,data.msg.avatar,data.msg.mail,data.msg._id,callback,close_callback);
+	                    }else if (data.status == 500) {
+	                        iva_alert(container,'邮箱已存在');
+	                    }
+	                });
+	            }
+	        });
+	        $login.click(function(){
+	            $regester.fadeOut(300,function(){
+	                $regester.remove();
+	                __webpack_require__(28)(container);
+	            });
+	        });
+	        $('.close').click(function(){
+	            $('.m-login-and-regester').fadeOut(300,function(){
+	                $(this).remove();
+	                if (close_callback)
+	                    close_callback();
+	            });
+	        });
 	    }
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*!
@@ -26212,7 +26256,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function ($) {
@@ -26246,7 +26290,7 @@ this["Iva"] =
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -26370,7 +26414,592 @@ this["Iva"] =
 
 
 /***/ },
-/* 50 */
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * zrender: loading特效类
+	 *
+	 * @author Kener (@Kener-林峰, kener.linfeng@gmail.com)
+	 *         errorrik (errorrik@gmail.com)
+	 */
+
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
+	        var util = __webpack_require__(34);
+	        var TextShape = __webpack_require__(65);
+	        var RectangleShape = __webpack_require__(66);
+
+
+	        var DEFAULT_TEXT = 'Loading...';
+	        var DEFAULT_TEXT_FONT = 'normal 16px Arial';
+
+	        /**
+	         * @constructor
+	         * 
+	         * @param {Object} options 选项
+	         * @param {color} options.backgroundColor 背景颜色
+	         * @param {Object} options.textStyle 文字样式，同shape/text.style
+	         * @param {number=} options.progress 进度参数，部分特效有用
+	         * @param {Object=} options.effect 特效参数，部分特效有用
+	         * 
+	         * {
+	         *     effect,
+	         *     //loading话术
+	         *     text:'',
+	         *     // 水平安放位置，默认为 'center'，可指定x坐标
+	         *     x:'center' || 'left' || 'right' || {number},
+	         *     // 垂直安放位置，默认为'top'，可指定y坐标
+	         *     y:'top' || 'bottom' || {number},
+	         *
+	         *     textStyle:{
+	         *         textFont: 'normal 20px Arial' || {textFont}, //文本字体
+	         *         color: {color}
+	         *     }
+	         * }
+	         */
+	        function Base(options) {
+	            this.setOptions(options);
+	        }
+
+	        /**
+	         * 创建loading文字图形
+	         * 
+	         * @param {Object} textStyle 文字style，同shape/text.style
+	         */
+	        Base.prototype.createTextShape = function (textStyle) {
+	            return new TextShape({
+	                highlightStyle : util.merge(
+	                    {
+	                        x : this.canvasWidth / 2,
+	                        y : this.canvasHeight / 2,
+	                        text : DEFAULT_TEXT,
+	                        textAlign : 'center',
+	                        textBaseline : 'middle',
+	                        textFont : DEFAULT_TEXT_FONT,
+	                        color: '#333',
+	                        brushType : 'fill'
+	                    },
+	                    textStyle,
+	                    true
+	                )
+	            });
+	        };
+	        
+	        /**
+	         * 获取loading背景图形
+	         * 
+	         * @param {color} color 背景颜色
+	         */
+	        Base.prototype.createBackgroundShape = function (color) {
+	            return new RectangleShape({
+	                highlightStyle : {
+	                    x : 0,
+	                    y : 0,
+	                    width : this.canvasWidth,
+	                    height : this.canvasHeight,
+	                    brushType : 'fill',
+	                    color : color
+	                }
+	            });
+	        };
+
+	        Base.prototype.start = function (painter) {
+	            this.canvasWidth = painter._width;
+	            this.canvasHeight = painter._height;
+
+	            function addShapeHandle(param) {
+	                painter.storage.addHover(param);
+	            }
+	            function refreshHandle() {
+	                painter.refreshHover();
+	            }
+	            this.loadingTimer = this._start(addShapeHandle, refreshHandle);
+	        };
+
+	        Base.prototype._start = function (/*addShapeHandle, refreshHandle*/) {
+	            return setInterval(function () {
+	            }, 10000);
+	        };
+
+	        Base.prototype.stop = function () {
+	            clearInterval(this.loadingTimer);
+	        };
+
+	        Base.prototype.setOptions = function (options) {
+	            this.options = options || {};
+	        };
+	        
+	        Base.prototype.adjust = function (value, region) {
+	            if (value <= region[0]) {
+	                value = region[0];
+	            }
+	            else if (value >= region[1]) {
+	                value = region[1];
+	            }
+	            return value;
+	        };
+	        
+	        Base.prototype.getLocation = function(loc, totalWidth, totalHeight) {
+	            var x = loc.x != null ? loc.x : 'center';
+	            switch (x) {
+	                case 'center' :
+	                    x = Math.floor((this.canvasWidth - totalWidth) / 2);
+	                    break;
+	                case 'left' :
+	                    x = 0;
+	                    break;
+	                case 'right' :
+	                    x = this.canvasWidth - totalWidth;
+	                    break;
+	            }
+	            var y = loc.y != null ? loc.y : 'center';
+	            switch (y) {
+	                case 'center' :
+	                    y = Math.floor((this.canvasHeight - totalHeight) / 2);
+	                    break;
+	                case 'top' :
+	                    y = 0;
+	                    break;
+	                case 'bottom' :
+	                    y = this.canvasHeight - totalHeight;
+	                    break;
+	            }
+	            return {
+	                x : x,
+	                y : y,
+	                width : totalWidth,
+	                height : totalHeight
+	            };
+	        };
+
+	        return Base;
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * @module zrender/Layer
+	 * @author pissang(https://www.github.com/pissang)
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	    var Transformable = __webpack_require__(58);
+	    var util = __webpack_require__(34);
+	    var vmlCanvasManager = window['G_vmlCanvasManager'];
+	    var config = __webpack_require__(50);
+
+	    function returnFalse() {
+	        return false;
+	    }
+
+	    /**
+	     * 创建dom
+	     * 
+	     * @inner
+	     * @param {string} id dom id 待用
+	     * @param {string} type dom type，such as canvas, div etc.
+	     * @param {Painter} painter painter instance
+	     */
+	    function createDom(id, type, painter) {
+	        var newDom = document.createElement(type);
+	        var width = painter.getWidth();
+	        var height = painter.getHeight();
+
+	        // 没append呢，请原谅我这样写，清晰~
+	        newDom.style.position = 'absolute';
+	        newDom.style.left = 0;
+	        newDom.style.top = 0;
+	        newDom.style.width = width + 'px';
+	        newDom.style.height = height + 'px';
+	        newDom.width = width * config.devicePixelRatio;
+	        newDom.height = height * config.devicePixelRatio;
+
+	        // id不作为索引用，避免可能造成的重名，定义为私有属性
+	        newDom.setAttribute('data-zr-dom-id', id);
+	        return newDom;
+	    }
+
+	    /**
+	     * @alias module:zrender/Layer
+	     * @constructor
+	     * @extends module:zrender/mixin/Transformable
+	     * @param {string} id
+	     * @param {module:zrender/Painter} painter
+	     */
+	    var Layer = function(id, painter) {
+
+	        this.id = id;
+
+	        this.dom = createDom(id, 'canvas', painter);
+	        this.dom.onselectstart = returnFalse; // 避免页面选中的尴尬
+	        this.dom.style['-webkit-user-select'] = 'none';
+	        this.dom.style['user-select'] = 'none';
+	        this.dom.style['-webkit-touch-callout'] = 'none';
+	        this.dom.style['-webkit-tap-highlight-color'] = 'rgba(0,0,0,0)';
+
+	        vmlCanvasManager && vmlCanvasManager.initElement(this.dom);
+
+	        this.domBack = null;
+	        this.ctxBack = null;
+
+	        this.painter = painter;
+
+	        this.unusedCount = 0;
+
+	        this.config = null;
+
+	        this.dirty = true;
+
+	        this.elCount = 0;
+
+	        // Configs
+	        /**
+	         * 每次清空画布的颜色
+	         * @type {string}
+	         * @default 0
+	         */
+	        this.clearColor = 0;
+	        /**
+	         * 是否开启动态模糊
+	         * @type {boolean}
+	         * @default false
+	         */
+	        this.motionBlur = false;
+	        /**
+	         * 在开启动态模糊的时候使用，与上一帧混合的alpha值，值越大尾迹越明显
+	         * @type {number}
+	         * @default 0.7
+	         */
+	        this.lastFrameAlpha = 0.7;
+	        /**
+	         * 层是否支持鼠标平移操作
+	         * @type {boolean}
+	         * @default false
+	         */
+	        this.zoomable = false;
+	        /**
+	         * 层是否支持鼠标缩放操作
+	         * @type {boolean}
+	         * @default false
+	         */
+	        this.panable = false;
+
+	        this.maxZoom = Infinity;
+	        this.minZoom = 0;
+
+	        Transformable.call(this);
+	    };
+
+	    Layer.prototype.initContext = function () {
+	        this.ctx = this.dom.getContext('2d');
+
+	        var dpr = config.devicePixelRatio;
+	        if (dpr != 1) { 
+	            this.ctx.scale(dpr, dpr);
+	        }
+	    };
+
+	    Layer.prototype.createBackBuffer = function () {
+	        if (vmlCanvasManager) { // IE 8- should not support back buffer
+	            return;
+	        }
+	        this.domBack = createDom('back-' + this.id, 'canvas', this.painter);
+	        this.ctxBack = this.domBack.getContext('2d');
+
+	        var dpr = config.devicePixelRatio;
+
+	        if (dpr != 1) { 
+	            this.ctxBack.scale(dpr, dpr);
+	        }
+	    };
+
+	    /**
+	     * @param  {number} width
+	     * @param  {number} height
+	     */
+	    Layer.prototype.resize = function (width, height) {
+	        var dpr = config.devicePixelRatio;
+
+	        this.dom.style.width = width + 'px';
+	        this.dom.style.height = height + 'px';
+
+	        this.dom.setAttribute('width', width * dpr);
+	        this.dom.setAttribute('height', height * dpr);
+
+	        if (dpr != 1) { 
+	            this.ctx.scale(dpr, dpr);
+	        }
+
+	        if (this.domBack) {
+	            this.domBack.setAttribute('width', width * dpr);
+	            this.domBack.setAttribute('height', height * dpr);
+
+	            if (dpr != 1) { 
+	                this.ctxBack.scale(dpr, dpr);
+	            }
+	        }
+	    };
+
+	    /**
+	     * 清空该层画布
+	     */
+	    Layer.prototype.clear = function () {
+	        var dom = this.dom;
+	        var ctx = this.ctx;
+	        var width = dom.width;
+	        var height = dom.height;
+
+	        var haveClearColor = this.clearColor && !vmlCanvasManager;
+	        var haveMotionBLur = this.motionBlur && !vmlCanvasManager;
+	        var lastFrameAlpha = this.lastFrameAlpha;
+	        
+	        var dpr = config.devicePixelRatio;
+
+	        if (haveMotionBLur) {
+	            if (!this.domBack) {
+	                this.createBackBuffer();
+	            } 
+
+	            this.ctxBack.globalCompositeOperation = 'copy';
+	            this.ctxBack.drawImage(
+	                dom, 0, 0,
+	                width / dpr,
+	                height / dpr
+	            );
+	        }
+
+	        ctx.clearRect(0, 0, width / dpr, height / dpr);
+	        if (haveClearColor) {
+	            ctx.save();
+	            ctx.fillStyle = this.clearColor;
+	            ctx.fillRect(0, 0, width / dpr, height / dpr);
+	            ctx.restore();
+	        }
+
+	        if (haveMotionBLur) {
+	            var domBack = this.domBack;
+	            ctx.save();
+	            ctx.globalAlpha = lastFrameAlpha;
+	            ctx.drawImage(domBack, 0, 0, width / dpr, height / dpr);
+	            ctx.restore();
+	        }
+	    };
+
+	    util.merge(Layer.prototype, Transformable.prototype);
+
+	    return Layer;
+	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+	 * 图片绘制
+	 * @module zrender/shape/Image
+	 * @author pissang(https://www.github.com/pissang)
+	 * @example
+	 *     var ImageShape = require('zrender/shape/Image');
+	 *     var image = new ImageShape({
+	 *         style: {
+	 *             image: 'test.jpg',
+	 *             x: 100,
+	 *             y: 100
+	 *         }
+	 *     });
+	 *     zr.addShape(image);
+	 */
+
+	/**
+	 * @typedef {Object} IImageStyle
+	 * @property {string|HTMLImageElement|HTMLCanvasElement} image 图片url或者图片对象
+	 * @property {number} x 左上角横坐标
+	 * @property {number} y 左上角纵坐标
+	 * @property {number} [width] 绘制到画布上的宽度，默认为图片宽度
+	 * @property {number} [height] 绘制到画布上的高度，默认为图片高度
+	 * @property {number} [sx=0] 从图片中裁剪的左上角横坐标
+	 * @property {number} [sy=0] 从图片中裁剪的左上角纵坐标
+	 * @property {number} [sWidth] 从图片中裁剪的宽度，默认为图片高度
+	 * @property {number} [sHeight] 从图片中裁剪的高度，默认为图片高度
+	 * @property {number} [opacity=1] 绘制透明度
+	 * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+	 * @property {string} [shadowColor='#000000'] 阴影颜色
+	 * @property {number} [shadowOffsetX=0] 阴影横向偏移
+	 * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+	 * @property {string} [text] 图形中的附加文本
+	 * @property {string} [textColor='#000000'] 文本颜色
+	 * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+	 * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+	 * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+	 *                                可以是start, end, left, right, center
+	 * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+	 */
+	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
+
+	        var Base = __webpack_require__(41);
+
+	        /**
+	         * @alias zrender/shape/Image
+	         * @constructor
+	         * @extends module:zrender/shape/Base
+	         * @param {Object} options
+	         */
+	        var ZImage = function(options) {
+	            Base.call(this, options);
+	            /**
+	             * 图片绘制样式
+	             * @name module:zrender/shape/Image#style
+	             * @type {module:zrender/shape/Image~IImageStyle}
+	             */
+	            /**
+	             * 图片高亮绘制样式
+	             * @name module:zrender/shape/Image#highlightStyle
+	             * @type {module:zrender/shape/Image~IImageStyle}
+	             */
+	        };
+
+	        ZImage.prototype = {
+	            
+	            type: 'image',
+
+	            brush : function(ctx, isHighlight, refreshNextFrame) {
+	                var style = this.style || {};
+
+	                if (isHighlight) {
+	                    // 根据style扩展默认高亮样式
+	                    style = this.getHighlightStyle(
+	                        style, this.highlightStyle || {}
+	                    );
+	                }
+
+	                var image = style.image;
+	                var self = this;
+
+	                if (!this._imageCache) {
+	                    this._imageCache = {};
+	                }
+	                if (typeof(image) === 'string') {
+	                    var src = image;
+	                    if (this._imageCache[src]) {
+	                        image = this._imageCache[src];
+	                    } else {
+	                        image = new Image();
+	                        image.onload = function () {
+	                            image.onload = null;
+	                            self.modSelf();
+	                            refreshNextFrame();
+	                        };
+
+	                        image.src = src;
+	                        this._imageCache[src] = image;
+	                    }
+	                }
+	                if (image) {
+	                    // 图片已经加载完成
+	                    if (image.nodeName.toUpperCase() == 'IMG') {
+	                        if (window.ActiveXObject) {
+	                            if (image.readyState != 'complete') {
+	                                return;
+	                            }
+	                        }
+	                        else {
+	                            if (!image.complete) {
+	                                return;
+	                            }
+	                        }
+	                    }
+	                    // Else is canvas
+	                    var width = style.width || image.width;
+	                    var height = style.height || image.height;
+	                    var x = style.x;
+	                    var y = style.y;
+	                    // 图片加载失败
+	                    if (!image.width || !image.height) {
+	                        return;
+	                    }
+
+	                    ctx.save();
+
+	                    this.doClip(ctx);
+
+	                    this.setContext(ctx, style);
+
+	                    // 设置transform
+	                    this.setTransform(ctx);
+
+	                    if (style.sWidth && style.sHeight) {
+	                        var sx = style.sx || 0;
+	                        var sy = style.sy || 0;
+	                        ctx.drawImage(
+	                            image,
+	                            sx, sy, style.sWidth, style.sHeight,
+	                            x, y, width, height
+	                        );
+	                    }
+	                    else if (style.sx && style.sy) {
+	                        var sx = style.sx;
+	                        var sy = style.sy;
+	                        var sWidth = width - sx;
+	                        var sHeight = height - sy;
+	                        ctx.drawImage(
+	                            image,
+	                            sx, sy, sWidth, sHeight,
+	                            x, y, width, height
+	                        );
+	                    }
+	                    else {
+	                        ctx.drawImage(image, x, y, width, height);
+	                    }
+	                    // 如果没设置宽和高的话自动根据图片宽高设置
+	                    if (!style.width) {
+	                        style.width = width;
+	                    }
+	                    if (!style.height) {
+	                        style.height = height;
+	                    }
+	                    if (!this.style.width) {
+	                        this.style.width = width;
+	                    }
+	                    if (!this.style.height) {
+	                        this.style.height = height;
+	                    }
+
+	                    this.drawText(ctx, style, this.style);
+
+	                    ctx.restore();
+	                }
+	            },
+
+	            /**
+	             * 计算返回图片的包围盒矩形
+	             * @param {module:zrender/shape/Image~IImageStyle} style
+	             * @return {module:zrender/shape/Base~IBoundingRect}
+	             */
+	            getRect: function(style) {
+	                return {
+	                    x : style.x,
+	                    y : style.y,
+	                    width : style.width,
+	                    height : style.height
+	                };
+	            },
+
+	            clearCache: function() {
+	                this._imageCache = {};
+	            }
+	        };
+
+	        __webpack_require__(34).inherits(ZImage, Base);
+	        return ZImage;
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -26652,7 +27281,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 51 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -26828,7 +27457,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 52 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -27101,592 +27730,7 @@ this["Iva"] =
 
 
 /***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * zrender: loading特效类
-	 *
-	 * @author Kener (@Kener-林峰, kener.linfeng@gmail.com)
-	 *         errorrik (errorrik@gmail.com)
-	 */
-
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
-	        var util = __webpack_require__(33);
-	        var TextShape = __webpack_require__(64);
-	        var RectangleShape = __webpack_require__(65);
-
-
-	        var DEFAULT_TEXT = 'Loading...';
-	        var DEFAULT_TEXT_FONT = 'normal 16px Arial';
-
-	        /**
-	         * @constructor
-	         * 
-	         * @param {Object} options 选项
-	         * @param {color} options.backgroundColor 背景颜色
-	         * @param {Object} options.textStyle 文字样式，同shape/text.style
-	         * @param {number=} options.progress 进度参数，部分特效有用
-	         * @param {Object=} options.effect 特效参数，部分特效有用
-	         * 
-	         * {
-	         *     effect,
-	         *     //loading话术
-	         *     text:'',
-	         *     // 水平安放位置，默认为 'center'，可指定x坐标
-	         *     x:'center' || 'left' || 'right' || {number},
-	         *     // 垂直安放位置，默认为'top'，可指定y坐标
-	         *     y:'top' || 'bottom' || {number},
-	         *
-	         *     textStyle:{
-	         *         textFont: 'normal 20px Arial' || {textFont}, //文本字体
-	         *         color: {color}
-	         *     }
-	         * }
-	         */
-	        function Base(options) {
-	            this.setOptions(options);
-	        }
-
-	        /**
-	         * 创建loading文字图形
-	         * 
-	         * @param {Object} textStyle 文字style，同shape/text.style
-	         */
-	        Base.prototype.createTextShape = function (textStyle) {
-	            return new TextShape({
-	                highlightStyle : util.merge(
-	                    {
-	                        x : this.canvasWidth / 2,
-	                        y : this.canvasHeight / 2,
-	                        text : DEFAULT_TEXT,
-	                        textAlign : 'center',
-	                        textBaseline : 'middle',
-	                        textFont : DEFAULT_TEXT_FONT,
-	                        color: '#333',
-	                        brushType : 'fill'
-	                    },
-	                    textStyle,
-	                    true
-	                )
-	            });
-	        };
-	        
-	        /**
-	         * 获取loading背景图形
-	         * 
-	         * @param {color} color 背景颜色
-	         */
-	        Base.prototype.createBackgroundShape = function (color) {
-	            return new RectangleShape({
-	                highlightStyle : {
-	                    x : 0,
-	                    y : 0,
-	                    width : this.canvasWidth,
-	                    height : this.canvasHeight,
-	                    brushType : 'fill',
-	                    color : color
-	                }
-	            });
-	        };
-
-	        Base.prototype.start = function (painter) {
-	            this.canvasWidth = painter._width;
-	            this.canvasHeight = painter._height;
-
-	            function addShapeHandle(param) {
-	                painter.storage.addHover(param);
-	            }
-	            function refreshHandle() {
-	                painter.refreshHover();
-	            }
-	            this.loadingTimer = this._start(addShapeHandle, refreshHandle);
-	        };
-
-	        Base.prototype._start = function (/*addShapeHandle, refreshHandle*/) {
-	            return setInterval(function () {
-	            }, 10000);
-	        };
-
-	        Base.prototype.stop = function () {
-	            clearInterval(this.loadingTimer);
-	        };
-
-	        Base.prototype.setOptions = function (options) {
-	            this.options = options || {};
-	        };
-	        
-	        Base.prototype.adjust = function (value, region) {
-	            if (value <= region[0]) {
-	                value = region[0];
-	            }
-	            else if (value >= region[1]) {
-	                value = region[1];
-	            }
-	            return value;
-	        };
-	        
-	        Base.prototype.getLocation = function(loc, totalWidth, totalHeight) {
-	            var x = loc.x != null ? loc.x : 'center';
-	            switch (x) {
-	                case 'center' :
-	                    x = Math.floor((this.canvasWidth - totalWidth) / 2);
-	                    break;
-	                case 'left' :
-	                    x = 0;
-	                    break;
-	                case 'right' :
-	                    x = this.canvasWidth - totalWidth;
-	                    break;
-	            }
-	            var y = loc.y != null ? loc.y : 'center';
-	            switch (y) {
-	                case 'center' :
-	                    y = Math.floor((this.canvasHeight - totalHeight) / 2);
-	                    break;
-	                case 'top' :
-	                    y = 0;
-	                    break;
-	                case 'bottom' :
-	                    y = this.canvasHeight - totalHeight;
-	                    break;
-	            }
-	            return {
-	                x : x,
-	                y : y,
-	                width : totalWidth,
-	                height : totalHeight
-	            };
-	        };
-
-	        return Base;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 54 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * @module zrender/Layer
-	 * @author pissang(https://www.github.com/pissang)
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	    var Transformable = __webpack_require__(58);
-	    var util = __webpack_require__(33);
-	    var vmlCanvasManager = window['G_vmlCanvasManager'];
-	    var config = __webpack_require__(49);
-
-	    function returnFalse() {
-	        return false;
-	    }
-
-	    /**
-	     * 创建dom
-	     * 
-	     * @inner
-	     * @param {string} id dom id 待用
-	     * @param {string} type dom type，such as canvas, div etc.
-	     * @param {Painter} painter painter instance
-	     */
-	    function createDom(id, type, painter) {
-	        var newDom = document.createElement(type);
-	        var width = painter.getWidth();
-	        var height = painter.getHeight();
-
-	        // 没append呢，请原谅我这样写，清晰~
-	        newDom.style.position = 'absolute';
-	        newDom.style.left = 0;
-	        newDom.style.top = 0;
-	        newDom.style.width = width + 'px';
-	        newDom.style.height = height + 'px';
-	        newDom.width = width * config.devicePixelRatio;
-	        newDom.height = height * config.devicePixelRatio;
-
-	        // id不作为索引用，避免可能造成的重名，定义为私有属性
-	        newDom.setAttribute('data-zr-dom-id', id);
-	        return newDom;
-	    }
-
-	    /**
-	     * @alias module:zrender/Layer
-	     * @constructor
-	     * @extends module:zrender/mixin/Transformable
-	     * @param {string} id
-	     * @param {module:zrender/Painter} painter
-	     */
-	    var Layer = function(id, painter) {
-
-	        this.id = id;
-
-	        this.dom = createDom(id, 'canvas', painter);
-	        this.dom.onselectstart = returnFalse; // 避免页面选中的尴尬
-	        this.dom.style['-webkit-user-select'] = 'none';
-	        this.dom.style['user-select'] = 'none';
-	        this.dom.style['-webkit-touch-callout'] = 'none';
-	        this.dom.style['-webkit-tap-highlight-color'] = 'rgba(0,0,0,0)';
-
-	        vmlCanvasManager && vmlCanvasManager.initElement(this.dom);
-
-	        this.domBack = null;
-	        this.ctxBack = null;
-
-	        this.painter = painter;
-
-	        this.unusedCount = 0;
-
-	        this.config = null;
-
-	        this.dirty = true;
-
-	        this.elCount = 0;
-
-	        // Configs
-	        /**
-	         * 每次清空画布的颜色
-	         * @type {string}
-	         * @default 0
-	         */
-	        this.clearColor = 0;
-	        /**
-	         * 是否开启动态模糊
-	         * @type {boolean}
-	         * @default false
-	         */
-	        this.motionBlur = false;
-	        /**
-	         * 在开启动态模糊的时候使用，与上一帧混合的alpha值，值越大尾迹越明显
-	         * @type {number}
-	         * @default 0.7
-	         */
-	        this.lastFrameAlpha = 0.7;
-	        /**
-	         * 层是否支持鼠标平移操作
-	         * @type {boolean}
-	         * @default false
-	         */
-	        this.zoomable = false;
-	        /**
-	         * 层是否支持鼠标缩放操作
-	         * @type {boolean}
-	         * @default false
-	         */
-	        this.panable = false;
-
-	        this.maxZoom = Infinity;
-	        this.minZoom = 0;
-
-	        Transformable.call(this);
-	    };
-
-	    Layer.prototype.initContext = function () {
-	        this.ctx = this.dom.getContext('2d');
-
-	        var dpr = config.devicePixelRatio;
-	        if (dpr != 1) { 
-	            this.ctx.scale(dpr, dpr);
-	        }
-	    };
-
-	    Layer.prototype.createBackBuffer = function () {
-	        if (vmlCanvasManager) { // IE 8- should not support back buffer
-	            return;
-	        }
-	        this.domBack = createDom('back-' + this.id, 'canvas', this.painter);
-	        this.ctxBack = this.domBack.getContext('2d');
-
-	        var dpr = config.devicePixelRatio;
-
-	        if (dpr != 1) { 
-	            this.ctxBack.scale(dpr, dpr);
-	        }
-	    };
-
-	    /**
-	     * @param  {number} width
-	     * @param  {number} height
-	     */
-	    Layer.prototype.resize = function (width, height) {
-	        var dpr = config.devicePixelRatio;
-
-	        this.dom.style.width = width + 'px';
-	        this.dom.style.height = height + 'px';
-
-	        this.dom.setAttribute('width', width * dpr);
-	        this.dom.setAttribute('height', height * dpr);
-
-	        if (dpr != 1) { 
-	            this.ctx.scale(dpr, dpr);
-	        }
-
-	        if (this.domBack) {
-	            this.domBack.setAttribute('width', width * dpr);
-	            this.domBack.setAttribute('height', height * dpr);
-
-	            if (dpr != 1) { 
-	                this.ctxBack.scale(dpr, dpr);
-	            }
-	        }
-	    };
-
-	    /**
-	     * 清空该层画布
-	     */
-	    Layer.prototype.clear = function () {
-	        var dom = this.dom;
-	        var ctx = this.ctx;
-	        var width = dom.width;
-	        var height = dom.height;
-
-	        var haveClearColor = this.clearColor && !vmlCanvasManager;
-	        var haveMotionBLur = this.motionBlur && !vmlCanvasManager;
-	        var lastFrameAlpha = this.lastFrameAlpha;
-	        
-	        var dpr = config.devicePixelRatio;
-
-	        if (haveMotionBLur) {
-	            if (!this.domBack) {
-	                this.createBackBuffer();
-	            } 
-
-	            this.ctxBack.globalCompositeOperation = 'copy';
-	            this.ctxBack.drawImage(
-	                dom, 0, 0,
-	                width / dpr,
-	                height / dpr
-	            );
-	        }
-
-	        ctx.clearRect(0, 0, width / dpr, height / dpr);
-	        if (haveClearColor) {
-	            ctx.save();
-	            ctx.fillStyle = this.clearColor;
-	            ctx.fillRect(0, 0, width / dpr, height / dpr);
-	            ctx.restore();
-	        }
-
-	        if (haveMotionBLur) {
-	            var domBack = this.domBack;
-	            ctx.save();
-	            ctx.globalAlpha = lastFrameAlpha;
-	            ctx.drawImage(domBack, 0, 0, width / dpr, height / dpr);
-	            ctx.restore();
-	        }
-	    };
-
-	    util.merge(Layer.prototype, Transformable.prototype);
-
-	    return Layer;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
-	 * 图片绘制
-	 * @module zrender/shape/Image
-	 * @author pissang(https://www.github.com/pissang)
-	 * @example
-	 *     var ImageShape = require('zrender/shape/Image');
-	 *     var image = new ImageShape({
-	 *         style: {
-	 *             image: 'test.jpg',
-	 *             x: 100,
-	 *             y: 100
-	 *         }
-	 *     });
-	 *     zr.addShape(image);
-	 */
-
-	/**
-	 * @typedef {Object} IImageStyle
-	 * @property {string|HTMLImageElement|HTMLCanvasElement} image 图片url或者图片对象
-	 * @property {number} x 左上角横坐标
-	 * @property {number} y 左上角纵坐标
-	 * @property {number} [width] 绘制到画布上的宽度，默认为图片宽度
-	 * @property {number} [height] 绘制到画布上的高度，默认为图片高度
-	 * @property {number} [sx=0] 从图片中裁剪的左上角横坐标
-	 * @property {number} [sy=0] 从图片中裁剪的左上角纵坐标
-	 * @property {number} [sWidth] 从图片中裁剪的宽度，默认为图片高度
-	 * @property {number} [sHeight] 从图片中裁剪的高度，默认为图片高度
-	 * @property {number} [opacity=1] 绘制透明度
-	 * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
-	 * @property {string} [shadowColor='#000000'] 阴影颜色
-	 * @property {number} [shadowOffsetX=0] 阴影横向偏移
-	 * @property {number} [shadowOffsetY=0] 阴影纵向偏移
-	 * @property {string} [text] 图形中的附加文本
-	 * @property {string} [textColor='#000000'] 文本颜色
-	 * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
-	 * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
-	 * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
-	 *                                可以是start, end, left, right, center
-	 * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
-	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
-	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	        var Base = __webpack_require__(40);
-
-	        /**
-	         * @alias zrender/shape/Image
-	         * @constructor
-	         * @extends module:zrender/shape/Base
-	         * @param {Object} options
-	         */
-	        var ZImage = function(options) {
-	            Base.call(this, options);
-	            /**
-	             * 图片绘制样式
-	             * @name module:zrender/shape/Image#style
-	             * @type {module:zrender/shape/Image~IImageStyle}
-	             */
-	            /**
-	             * 图片高亮绘制样式
-	             * @name module:zrender/shape/Image#highlightStyle
-	             * @type {module:zrender/shape/Image~IImageStyle}
-	             */
-	        };
-
-	        ZImage.prototype = {
-	            
-	            type: 'image',
-
-	            brush : function(ctx, isHighlight, refreshNextFrame) {
-	                var style = this.style || {};
-
-	                if (isHighlight) {
-	                    // 根据style扩展默认高亮样式
-	                    style = this.getHighlightStyle(
-	                        style, this.highlightStyle || {}
-	                    );
-	                }
-
-	                var image = style.image;
-	                var self = this;
-
-	                if (!this._imageCache) {
-	                    this._imageCache = {};
-	                }
-	                if (typeof(image) === 'string') {
-	                    var src = image;
-	                    if (this._imageCache[src]) {
-	                        image = this._imageCache[src];
-	                    } else {
-	                        image = new Image();
-	                        image.onload = function () {
-	                            image.onload = null;
-	                            self.modSelf();
-	                            refreshNextFrame();
-	                        };
-
-	                        image.src = src;
-	                        this._imageCache[src] = image;
-	                    }
-	                }
-	                if (image) {
-	                    // 图片已经加载完成
-	                    if (image.nodeName.toUpperCase() == 'IMG') {
-	                        if (window.ActiveXObject) {
-	                            if (image.readyState != 'complete') {
-	                                return;
-	                            }
-	                        }
-	                        else {
-	                            if (!image.complete) {
-	                                return;
-	                            }
-	                        }
-	                    }
-	                    // Else is canvas
-	                    var width = style.width || image.width;
-	                    var height = style.height || image.height;
-	                    var x = style.x;
-	                    var y = style.y;
-	                    // 图片加载失败
-	                    if (!image.width || !image.height) {
-	                        return;
-	                    }
-
-	                    ctx.save();
-
-	                    this.doClip(ctx);
-
-	                    this.setContext(ctx, style);
-
-	                    // 设置transform
-	                    this.setTransform(ctx);
-
-	                    if (style.sWidth && style.sHeight) {
-	                        var sx = style.sx || 0;
-	                        var sy = style.sy || 0;
-	                        ctx.drawImage(
-	                            image,
-	                            sx, sy, style.sWidth, style.sHeight,
-	                            x, y, width, height
-	                        );
-	                    }
-	                    else if (style.sx && style.sy) {
-	                        var sx = style.sx;
-	                        var sy = style.sy;
-	                        var sWidth = width - sx;
-	                        var sHeight = height - sy;
-	                        ctx.drawImage(
-	                            image,
-	                            sx, sy, sWidth, sHeight,
-	                            x, y, width, height
-	                        );
-	                    }
-	                    else {
-	                        ctx.drawImage(image, x, y, width, height);
-	                    }
-	                    // 如果没设置宽和高的话自动根据图片宽高设置
-	                    if (!style.width) {
-	                        style.width = width;
-	                    }
-	                    if (!style.height) {
-	                        style.height = height;
-	                    }
-	                    if (!this.style.width) {
-	                        this.style.width = width;
-	                    }
-	                    if (!this.style.height) {
-	                        this.style.height = height;
-	                    }
-
-	                    this.drawText(ctx, style, this.style);
-
-	                    ctx.restore();
-	                }
-	            },
-
-	            /**
-	             * 计算返回图片的包围盒矩形
-	             * @param {module:zrender/shape/Image~IImageStyle} style
-	             * @return {module:zrender/shape/Base~IBoundingRect}
-	             */
-	            getRect: function(style) {
-	                return {
-	                    x : style.x,
-	                    y : style.y,
-	                    width : style.width,
-	                    height : style.height
-	                };
-	            },
-
-	            clearCache: function() {
-	                this._imageCache = {};
-	            }
-	        };
-
-	        __webpack_require__(33).inherits(ZImage, Base);
-	        return ZImage;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 56 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -27710,11 +27754,11 @@ this["Iva"] =
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	    var guid = __webpack_require__(35);
-	    var util = __webpack_require__(33);
+	    var guid = __webpack_require__(36);
+	    var util = __webpack_require__(34);
 
 	    var Transformable = __webpack_require__(58);
-	    var Eventful = __webpack_require__(52);
+	    var Eventful = __webpack_require__(56);
 
 	    /**
 	     * @alias module:zrender/Group
@@ -27922,359 +27966,6 @@ this["Iva"] =
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
-	        /**
-	         * 缓动代码来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
-	         * @see http://sole.github.io/tween.js/examples/03_graphs.html
-	         * @exports zrender/animation/easing
-	         */
-	        var easing = {
-	            // 线性
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            Linear: function (k) {
-	                return k;
-	            },
-
-	            // 二次方的缓动（t^2）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuadraticIn: function (k) {
-	                return k * k;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuadraticOut: function (k) {
-	                return k * (2 - k);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuadraticInOut: function (k) {
-	                if ((k *= 2) < 1) {
-	                    return 0.5 * k * k;
-	                }
-	                return -0.5 * (--k * (k - 2) - 1);
-	            },
-
-	            // 三次方的缓动（t^3）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            CubicIn: function (k) {
-	                return k * k * k;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            CubicOut: function (k) {
-	                return --k * k * k + 1;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            CubicInOut: function (k) {
-	                if ((k *= 2) < 1) {
-	                    return 0.5 * k * k * k;
-	                }
-	                return 0.5 * ((k -= 2) * k * k + 2);
-	            },
-
-	            // 四次方的缓动（t^4）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuarticIn: function (k) {
-	                return k * k * k * k;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuarticOut: function (k) {
-	                return 1 - (--k * k * k * k);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuarticInOut: function (k) {
-	                if ((k *= 2) < 1) {
-	                    return 0.5 * k * k * k * k;
-	                }
-	                return -0.5 * ((k -= 2) * k * k * k - 2);
-	            },
-
-	            // 五次方的缓动（t^5）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuinticIn: function (k) {
-	                return k * k * k * k * k;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuinticOut: function (k) {
-	                return --k * k * k * k * k + 1;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            QuinticInOut: function (k) {
-	                if ((k *= 2) < 1) {
-	                    return 0.5 * k * k * k * k * k;
-	                }
-	                return 0.5 * ((k -= 2) * k * k * k * k + 2);
-	            },
-
-	            // 正弦曲线的缓动（sin(t)）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            SinusoidalIn: function (k) {
-	                return 1 - Math.cos(k * Math.PI / 2);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            SinusoidalOut: function (k) {
-	                return Math.sin(k * Math.PI / 2);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            SinusoidalInOut: function (k) {
-	                return 0.5 * (1 - Math.cos(Math.PI * k));
-	            },
-
-	            // 指数曲线的缓动（2^t）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            ExponentialIn: function (k) {
-	                return k === 0 ? 0 : Math.pow(1024, k - 1);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            ExponentialOut: function (k) {
-	                return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            ExponentialInOut: function (k) {
-	                if (k === 0) {
-	                    return 0;
-	                }
-	                if (k === 1) {
-	                    return 1;
-	                }
-	                if ((k *= 2) < 1) {
-	                    return 0.5 * Math.pow(1024, k - 1);
-	                }
-	                return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
-	            },
-
-	            // 圆形曲线的缓动（sqrt(1-t^2)）
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            CircularIn: function (k) {
-	                return 1 - Math.sqrt(1 - k * k);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            CircularOut: function (k) {
-	                return Math.sqrt(1 - (--k * k));
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            CircularInOut: function (k) {
-	                if ((k *= 2) < 1) {
-	                    return -0.5 * (Math.sqrt(1 - k * k) - 1);
-	                }
-	                return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
-	            },
-
-	            // 创建类似于弹簧在停止前来回振荡的动画
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            ElasticIn: function (k) {
-	                var s; 
-	                var a = 0.1;
-	                var p = 0.4;
-	                if (k === 0) {
-	                    return 0;
-	                }
-	                if (k === 1) {
-	                    return 1;
-	                }
-	                if (!a || a < 1) {
-	                    a = 1; s = p / 4;
-	                }
-	                else {
-	                    s = p * Math.asin(1 / a) / (2 * Math.PI);
-	                }
-	                return -(a * Math.pow(2, 10 * (k -= 1)) *
-	                            Math.sin((k - s) * (2 * Math.PI) / p));
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            ElasticOut: function (k) {
-	                var s;
-	                var a = 0.1;
-	                var p = 0.4;
-	                if (k === 0) {
-	                    return 0;
-	                }
-	                if (k === 1) {
-	                    return 1;
-	                }
-	                if (!a || a < 1) {
-	                    a = 1; s = p / 4;
-	                }
-	                else {
-	                    s = p * Math.asin(1 / a) / (2 * Math.PI);
-	                }
-	                return (a * Math.pow(2, -10 * k) *
-	                        Math.sin((k - s) * (2 * Math.PI) / p) + 1);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            ElasticInOut: function (k) {
-	                var s;
-	                var a = 0.1;
-	                var p = 0.4;
-	                if (k === 0) {
-	                    return 0;
-	                }
-	                if (k === 1) {
-	                    return 1;
-	                }
-	                if (!a || a < 1) {
-	                    a = 1; s = p / 4;
-	                }
-	                else {
-	                    s = p * Math.asin(1 / a) / (2 * Math.PI);
-	                }
-	                if ((k *= 2) < 1) {
-	                    return -0.5 * (a * Math.pow(2, 10 * (k -= 1))
-	                        * Math.sin((k - s) * (2 * Math.PI) / p));
-	                }
-	                return a * Math.pow(2, -10 * (k -= 1))
-	                        * Math.sin((k - s) * (2 * Math.PI) / p) * 0.5 + 1;
-
-	            },
-
-	            // 在某一动画开始沿指示的路径进行动画处理前稍稍收回该动画的移动
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            BackIn: function (k) {
-	                var s = 1.70158;
-	                return k * k * ((s + 1) * k - s);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            BackOut: function (k) {
-	                var s = 1.70158;
-	                return --k * k * ((s + 1) * k + s) + 1;
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            BackInOut: function (k) {
-	                var s = 1.70158 * 1.525;
-	                if ((k *= 2) < 1) {
-	                    return 0.5 * (k * k * ((s + 1) * k - s));
-	                }
-	                return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
-	            },
-
-	            // 创建弹跳效果
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            BounceIn: function (k) {
-	                return 1 - easing.BounceOut(1 - k);
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            BounceOut: function (k) {
-	                if (k < (1 / 2.75)) {
-	                    return 7.5625 * k * k;
-	                }
-	                else if (k < (2 / 2.75)) {
-	                    return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
-	                }
-	                else if (k < (2.5 / 2.75)) {
-	                    return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
-	                }
-	                else {
-	                    return 7.5625 * (k -= (2.625 / 2.75)) * k + 0.984375;
-	                }
-	            },
-	            /**
-	             * @param {number} k
-	             * @return {number}
-	             */
-	            BounceInOut: function (k) {
-	                if (k < 0.5) {
-	                    return easing.BounceIn(k * 2) * 0.5;
-	                }
-	                return easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
-	            }
-	        };
-
-	        return easing;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-
-/***/ },
 /* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28287,8 +27978,8 @@ this["Iva"] =
 
 	    'use strict';
 
-	    var matrix = __webpack_require__(51);
-	    var vector = __webpack_require__(50);
+	    var matrix = __webpack_require__(55);
+	    var vector = __webpack_require__(54);
 	    var origin = [0, 0];
 
 	    var mTranslate = matrix.translate;
@@ -28547,8 +28238,8 @@ this["Iva"] =
 
 	        'use strict';
 
-	        var util = __webpack_require__(33);
-	        var curve = __webpack_require__(66);
+	        var util = __webpack_require__(34);
+	        var curve = __webpack_require__(67);
 
 	        var _ctx;
 	        
@@ -29396,80 +29087,361 @@ this["Iva"] =
 /* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    var tmpl = "<div class='m-login'>\
-	                    <div class='iconfont exit'>&#xe620</div>\
-	                    <div class='title'>欢 迎 回 来</div>\
-	                    <div class='line'></div>\
-	                    <div class='input-box-container account-input-container'>\
-	                        <input class='input-box account-input' placeholder='请输入邮箱或手机号'>\
-	                        <div class='iconfont input-icon'>&#xe60c</div>\
-	                    </div>\
-	                    <div class='input-box-container passwd-input-container'>\
-	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码'>\
-	                        <div class='iconfont input-icon'>&#xe621</div>\
-	                    </div>\
-	                    <div class='log-text click-text'>\
-	                        <span class='forget log-inside-text'>忘记密码</span>\
-	                        <span class='log-inside-text' style='margin-left:8px;margin-right:8px;cursor:default'>or</span>\
-	                        <span class='regester log-inside-text'>注册</span>\
-	                    </div>\
-	                    <input type='button' class='u-button button login-button' value='登  录'></input>\
-	                </div>";
-	    return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+	        /**
+	         * 缓动代码来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
+	         * @see http://sole.github.io/tween.js/examples/03_graphs.html
+	         * @exports zrender/animation/easing
+	         */
+	        var easing = {
+	            // 线性
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            Linear: function (k) {
+	                return k;
+	            },
+
+	            // 二次方的缓动（t^2）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuadraticIn: function (k) {
+	                return k * k;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuadraticOut: function (k) {
+	                return k * (2 - k);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuadraticInOut: function (k) {
+	                if ((k *= 2) < 1) {
+	                    return 0.5 * k * k;
+	                }
+	                return -0.5 * (--k * (k - 2) - 1);
+	            },
+
+	            // 三次方的缓动（t^3）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            CubicIn: function (k) {
+	                return k * k * k;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            CubicOut: function (k) {
+	                return --k * k * k + 1;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            CubicInOut: function (k) {
+	                if ((k *= 2) < 1) {
+	                    return 0.5 * k * k * k;
+	                }
+	                return 0.5 * ((k -= 2) * k * k + 2);
+	            },
+
+	            // 四次方的缓动（t^4）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuarticIn: function (k) {
+	                return k * k * k * k;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuarticOut: function (k) {
+	                return 1 - (--k * k * k * k);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuarticInOut: function (k) {
+	                if ((k *= 2) < 1) {
+	                    return 0.5 * k * k * k * k;
+	                }
+	                return -0.5 * ((k -= 2) * k * k * k - 2);
+	            },
+
+	            // 五次方的缓动（t^5）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuinticIn: function (k) {
+	                return k * k * k * k * k;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuinticOut: function (k) {
+	                return --k * k * k * k * k + 1;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            QuinticInOut: function (k) {
+	                if ((k *= 2) < 1) {
+	                    return 0.5 * k * k * k * k * k;
+	                }
+	                return 0.5 * ((k -= 2) * k * k * k * k + 2);
+	            },
+
+	            // 正弦曲线的缓动（sin(t)）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            SinusoidalIn: function (k) {
+	                return 1 - Math.cos(k * Math.PI / 2);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            SinusoidalOut: function (k) {
+	                return Math.sin(k * Math.PI / 2);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            SinusoidalInOut: function (k) {
+	                return 0.5 * (1 - Math.cos(Math.PI * k));
+	            },
+
+	            // 指数曲线的缓动（2^t）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            ExponentialIn: function (k) {
+	                return k === 0 ? 0 : Math.pow(1024, k - 1);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            ExponentialOut: function (k) {
+	                return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            ExponentialInOut: function (k) {
+	                if (k === 0) {
+	                    return 0;
+	                }
+	                if (k === 1) {
+	                    return 1;
+	                }
+	                if ((k *= 2) < 1) {
+	                    return 0.5 * Math.pow(1024, k - 1);
+	                }
+	                return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
+	            },
+
+	            // 圆形曲线的缓动（sqrt(1-t^2)）
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            CircularIn: function (k) {
+	                return 1 - Math.sqrt(1 - k * k);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            CircularOut: function (k) {
+	                return Math.sqrt(1 - (--k * k));
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            CircularInOut: function (k) {
+	                if ((k *= 2) < 1) {
+	                    return -0.5 * (Math.sqrt(1 - k * k) - 1);
+	                }
+	                return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
+	            },
+
+	            // 创建类似于弹簧在停止前来回振荡的动画
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            ElasticIn: function (k) {
+	                var s; 
+	                var a = 0.1;
+	                var p = 0.4;
+	                if (k === 0) {
+	                    return 0;
+	                }
+	                if (k === 1) {
+	                    return 1;
+	                }
+	                if (!a || a < 1) {
+	                    a = 1; s = p / 4;
+	                }
+	                else {
+	                    s = p * Math.asin(1 / a) / (2 * Math.PI);
+	                }
+	                return -(a * Math.pow(2, 10 * (k -= 1)) *
+	                            Math.sin((k - s) * (2 * Math.PI) / p));
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            ElasticOut: function (k) {
+	                var s;
+	                var a = 0.1;
+	                var p = 0.4;
+	                if (k === 0) {
+	                    return 0;
+	                }
+	                if (k === 1) {
+	                    return 1;
+	                }
+	                if (!a || a < 1) {
+	                    a = 1; s = p / 4;
+	                }
+	                else {
+	                    s = p * Math.asin(1 / a) / (2 * Math.PI);
+	                }
+	                return (a * Math.pow(2, -10 * k) *
+	                        Math.sin((k - s) * (2 * Math.PI) / p) + 1);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            ElasticInOut: function (k) {
+	                var s;
+	                var a = 0.1;
+	                var p = 0.4;
+	                if (k === 0) {
+	                    return 0;
+	                }
+	                if (k === 1) {
+	                    return 1;
+	                }
+	                if (!a || a < 1) {
+	                    a = 1; s = p / 4;
+	                }
+	                else {
+	                    s = p * Math.asin(1 / a) / (2 * Math.PI);
+	                }
+	                if ((k *= 2) < 1) {
+	                    return -0.5 * (a * Math.pow(2, 10 * (k -= 1))
+	                        * Math.sin((k - s) * (2 * Math.PI) / p));
+	                }
+	                return a * Math.pow(2, -10 * (k -= 1))
+	                        * Math.sin((k - s) * (2 * Math.PI) / p) * 0.5 + 1;
+
+	            },
+
+	            // 在某一动画开始沿指示的路径进行动画处理前稍稍收回该动画的移动
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            BackIn: function (k) {
+	                var s = 1.70158;
+	                return k * k * ((s + 1) * k - s);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            BackOut: function (k) {
+	                var s = 1.70158;
+	                return --k * k * ((s + 1) * k + s) + 1;
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            BackInOut: function (k) {
+	                var s = 1.70158 * 1.525;
+	                if ((k *= 2) < 1) {
+	                    return 0.5 * (k * k * ((s + 1) * k - s));
+	                }
+	                return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
+	            },
+
+	            // 创建弹跳效果
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            BounceIn: function (k) {
+	                return 1 - easing.BounceOut(1 - k);
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            BounceOut: function (k) {
+	                if (k < (1 / 2.75)) {
+	                    return 7.5625 * k * k;
+	                }
+	                else if (k < (2 / 2.75)) {
+	                    return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
+	                }
+	                else if (k < (2.5 / 2.75)) {
+	                    return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
+	                }
+	                else {
+	                    return 7.5625 * (k -= (2.625 / 2.75)) * k + 0.984375;
+	                }
+	            },
+	            /**
+	             * @param {number} k
+	             * @return {number}
+	             */
+	            BounceInOut: function (k) {
+	                if (k < 0.5) {
+	                    return easing.BounceIn(k * 2) * 0.5;
+	                }
+	                return easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
+	            }
+	        };
+
+	        return easing;
+	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
 
 /***/ },
 /* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    var tmpl = "<div class='m-regester'>\
-	                    <div class='iconfont exit'>&#xe620</div>\
-	                    <div class='title'>加 入 我 们</div>\
-	                    <div class='line'></div>\
-	                    <div class='input-box-container account-input-container'>\
-	                        <input class='input-box account-input' placeholder='请输入邮箱'>\
-	                        <div class='iconfont input-icon'>&#xe62d</div>\
-	                    </div>\
-	                    <div class='input-box-container passwd-input-container'>\
-	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码,6-30位之间'>\
-	                        <div class='iconfont input-icon'>&#xe621</div>\
-	                    </div>\
-	                    <div class='regester-text click-text'>\
-	                        <span class='login log-inside-text'>有号？一键登录</span>\
-	                    </div>\
-	                    <input type='button' class='u-button button regester-button' value='注 册'></input>\
-	                </div>";
-	    return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 62 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    var tmpl = "<div class='m-success'>\
-	                    <div class='iconfont exit'>&#xe620</div>\
-	                    <div class='title'>注 册 成 功</div>\
-	                    <div class='line'></div>\
-	                    <div class='avatar'>\
-	                        <div class='avatar-inside'></div>\
-	                    </div>\
-	                    <div class='center-text text-up'>恭喜，获得100积分</div>\
-	                    <div class='center-text text-down'>邮箱激活账号获得更多积分</div>\
-	                    <input type='button' class='u-button button active-button' value='Go 激 活 邮 箱'></input>\
-	                    <input type='button' class='u-button button finish-button' value='完 成，继 续 观 看'></input>\
-	                </div>";
-	    return tmpl;
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-
-/***/ },
-/* 63 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(9),__webpack_require__(2),__webpack_require__(45),__webpack_require__(14),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,iva_alert,$) {
-	    return function (container,avatar_url,mail,id) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__,__webpack_require__(11),__webpack_require__(2),__webpack_require__(46),__webpack_require__(8),__webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (require,handlebar,ajax,logWindow_tmp,iva_alert,$) {
+	    return function (container,avatar_url,mail,id,callback,close_callback) {
 	        var mailDict = {
 	            'qq.com': 'http://mail.qq.com',
 	            'gmail.com': 'http://mail.google.com',
@@ -29496,46 +29468,125 @@ this["Iva"] =
 	        };
 	        var split_mail = mail.split('@');
 	        var mail_domin = split_mail[1];
-	        if (!$('.m-login-and-regester').length){
-	            var $success = $(handlebar.compile(logWindow_tmp('success'))());
-	            container.before($success);
-	            $success.hide();
-	            $success.fadeIn(300);
-	            $active_button = $success.find('.active-button');
-	            $finish_button = $success.find('.finish-button');
-	            $avatar = $success.find('.avatar-inside')
-	            $avatar.css({
-	                'background-image': 'url(' + avatar_url +')'
-	            });
-	            $active_button.click(function(){
-	                if (($.inArray(mail_domin,Object.keys(mailDict)))!= -1){
-	                    window.open(mailDict[mail_domin]);
-	                }else{
-	                    iva_alert('您的邮箱b格真高！请自己登陆去激活！');
-	                }
-	            });
-	            $finish_button.click(function(){
-	                ajax('/sign/signupMail', 'POST', {user_id: id}
-	                , function (data) {
-	                    if (data.status == 0)
-	                        callback(data.msg);
-	                        $success.fadeOut(300,function(){
-	                            $success.remove();
-	                        });
-	                });
-	            });
-	        }else{
+	        var $success = $(handlebar.compile(logWindow_tmp('success'))());
+	        container.before($success);
+	        $success.hide();
+	        $success.fadeIn(300);
+	        $exit = $success.find('.exit')
+	        $active_button = $success.find('.active-button');
+	        $finish_button = $success.find('.finish-button');
+	        $avatar = $success.find('.avatar-inside');
+	        $exit.click(function(){
 	            $('.m-login-and-regester').fadeOut(300,function(){
 	                $(this).remove();
 	                if (close_callback)
 	                    close_callback();
 	            });
-	        }
+	        });
+	        $avatar.css({
+	            'background-image': 'url(' + avatar_url +')'
+	        });
+	        $active_button.click(function(){
+	            if (($.inArray(mail_domin,Object.keys(mailDict)))!= -1){
+	                window.open(mailDict[mail_domin]);
+	            }else{
+	                iva_alert('您的邮箱b格真高！请自己登陆去激活！');
+	            }
+	        });
+	        $finish_button.click(function(){
+	            ajax('/user/findOne', 'POST', {user_id: id}
+	            , function (data) {
+	                if (data.status == 0)
+	                    callback(data.msg);
+	                    $success.fadeOut(300,function(){
+	                        $success.remove();
+	                    });
+	            });
+	        });
+	        $('.close').click(function(){
+	            $('.m-login-and-regester').fadeOut(300,function(){
+	                $(this).remove();
+	                if (close_callback)
+	                    close_callback();
+	            });
+	        });
 	    }
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 
 /***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    var tmpl = "<div class='m-login'>\
+	                    <div class='iconfont exit'>&#xe620</div>\
+	                    <div class='title'>欢 迎 回 来</div>\
+	                    <div class='line'></div>\
+	                    <div class='input-box-container account-input-container'>\
+	                        <input class='input-box account-input' placeholder='请输入邮箱或手机号'>\
+	                        <div class='iconfont input-icon'>&#xe60c</div>\
+	                    </div>\
+	                    <div class='input-box-container passwd-input-container'>\
+	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码'>\
+	                        <div class='iconfont input-icon'>&#xe621</div>\
+	                    </div>\
+	                    <div class='log-text click-text'>\
+	                        <span class='forget log-inside-text'>忘记密码</span>\
+	                        <span class='log-inside-text' style='margin-left:8px;margin-right:8px;cursor:default'>or</span>\
+	                        <span class='regester log-inside-text'>注册</span>\
+	                    </div>\
+	                    <input type='button' class='u-button button login-button' value='登  录'></input>\
+	                </div>";
+	    return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 63 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    var tmpl = "<div class='m-regester'>\
+	                    <div class='iconfont exit'>&#xe620</div>\
+	                    <div class='title'>加 入 我 们</div>\
+	                    <div class='line'></div>\
+	                    <div class='input-box-container account-input-container'>\
+	                        <input class='input-box account-input' placeholder='请输入邮箱'>\
+	                        <div class='iconfont input-icon'>&#xe62d</div>\
+	                    </div>\
+	                    <div class='input-box-container passwd-input-container'>\
+	                        <input type='password' class='input-box passwd-input' placeholder='请输入密码,6-30位之间'>\
+	                        <div class='iconfont input-icon'>&#xe621</div>\
+	                    </div>\
+	                    <div class='regester-text click-text'>\
+	                        <span class='login log-inside-text'>有号？一键登录</span>\
+	                    </div>\
+	                    <input type='button' class='u-button button regester-button' value='注 册'></input>\
+	                </div>";
+	    return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
 /* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	    var tmpl = "<div class='m-success'>\
+	                    <div class='iconfont exit'>&#xe620</div>\
+	                    <div class='title'>注 册 成 功</div>\
+	                    <div class='line'></div>\
+	                    <div class='avatar'>\
+	                        <div class='avatar-inside'></div>\
+	                    </div>\
+	                    <div class='center-text text-up'>恭喜，获得100积分</div>\
+	                    <div class='center-text text-down'>邮箱激活账号获得更多积分</div>\
+	                    <input type='button' class='u-button button active-button' value='Go 激 活 邮 箱'></input>\
+	                    <input type='button' class='u-button button finish-button' value='完 成，继 续 观 看'></input>\
+	                </div>";
+	    return tmpl;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+
+/***/ },
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -29577,7 +29628,7 @@ this["Iva"] =
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        var area = __webpack_require__(59);
-	        var Base = __webpack_require__(40);
+	        var Base = __webpack_require__(41);
 	        
 	        /**
 	         * @alias module:zrender/shape/Text
@@ -29743,14 +29794,14 @@ this["Iva"] =
 	            }
 	        };
 
-	        __webpack_require__(33).inherits(Text, Base);
+	        __webpack_require__(34).inherits(Text, Base);
 	        return Text;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 
 /***/ },
-/* 65 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -29799,7 +29850,7 @@ this["Iva"] =
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(40);
+	        var Base = __webpack_require__(41);
 	        
 	        /**
 	         * @alias module:zrender/shape/Rectangle
@@ -29954,13 +30005,13 @@ this["Iva"] =
 	            }
 	        };
 
-	        __webpack_require__(33).inherits(Rectangle, Base);
+	        __webpack_require__(34).inherits(Rectangle, Base);
 	        return Rectangle;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 66 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -29970,7 +30021,7 @@ this["Iva"] =
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	    var vector = __webpack_require__(50);
+	    var vector = __webpack_require__(54);
 
 	    'use strict';
 
