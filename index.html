@@ -3,11 +3,11 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <!-- <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'> -->
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <link rel="stylesheet" type="text/css" href="stylesheets/default.min.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-gist.css" media="screen">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -31,25 +31,22 @@
             <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true">
               <span class="octicon octicon-link"></span>
             </a>
-            Useage
+            Usage
           </h3>
-<pre>
-下载源代码
-
-引用样式文件Iva.css
-<code class="html">&lt;link rel="stylesheet" type="text/css" href="Iva.css"&gt;</code>
-引用脚本文件Iva.js
-<code class="html">&lt;script type="text/javascript" src="Iva.js"&gt;&lt;/script&gt;</code>
-创建Iva实例
-<code class="javascript">new Iva('playerCnt'/* 父容器id，为了保证浏览体验，请给父容器设置宽高860px*480px以上*/, {
-  video: 'http://v.youku.com/v_show/id_XODIzNTE5NTY0.html',/* 视频播放地址 */
-  cover: 'http://img0.bdstatic.com/img/image/4a75a05f8041bf84df4a4933667824811426747915.jpg'/* 视频封面，可选 */
+      <pre>
+      <code class="html">&lt;link rel="stylesheet" type="text/css" href="Iva.css"&gt;
+&lt;script type="text/javascript" src="Iva.js"&gt;&lt;/script&gt;</code>
+      <code class="javascript">
+new Iva('父容器id', {
+// 父容器id，为了保证浏览体验，请给父容器设置宽高860px*480px以上
+video: '视频播放地址',// http://v.youku.com/v_show/id_XODIzNTE5NTY0.html
+cover: '视频封面，可选 '// 视频封面，可选
 });</code>
-</pre>
+      </pre>
           <hr>
           <h3>
             <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>
-            Q & A
+            FAQ
           </h3>
           <p>
              提问 <a href="https://github.com/Venvy-dev/videojj-api/issues" class="user-mention">@issue主页</a>
