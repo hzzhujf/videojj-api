@@ -42,10 +42,11 @@
  */
 var ivaInstance = new Iva('父容器id',// 父容器id，给父容器设置宽高860px*480px以上可以获得最佳的浏览体验
   {
+    video: '视频播放地址',//http://v.youku.com/v_show/id_XODIzNTE5NTY0.html
     type: 0,//可选，视频类型，0代表播放地址，1代表资源地址，默认为0
     title: '小视频',//可选，视频标题，如果type为1，该项为必填
-    video: '视频播放地址',//http://v.youku.com/v_show/id_XODIzNTE5NTY0.html
-    cover: '视频封面 '//可选，视频封面
+    cover: '视频封面',//可选，视频封面
+    logoPosition: 'left'//可选，自定义LOGO位置，“left”表示左上角，“right”表示右上角，默认为“left”
   }
 );
 
