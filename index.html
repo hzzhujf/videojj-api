@@ -40,7 +40,8 @@
 /**
  * 创建Iva实例
  */
-var ivaInstance = new Iva('父容器',// 父容器id或者父容器DOM对象，给父容器设置宽高760px*480px以上可以获得最佳的浏览体验；如果宽高在760px*480px以下，Iva会以弹窗形式呈现
+var ivaInstance = new Iva(
+  '父容器',//父容器id或者父容器DOM对象，给父容器设置宽高760px*480px以上可以获得最佳的浏览体验；如果宽高在760px*480px以下，Iva会以弹窗形式呈现
   {
     video: '地址',//必填，http://v.youku.com/v_show/id_XODIzNTE5NTY0.html
     type: 0,//可选，视频类型，0代表播放地址，1代表资源地址，默认为0
